@@ -1,0 +1,23 @@
+name: Validate Features
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Validate Feature Metadata
+        uses: devcontainers/action@v1
+        with:
+          validate-only: "true"
+          base-path-to-features: "./src"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
