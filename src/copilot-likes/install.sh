@@ -6,8 +6,7 @@ echo "📦 Installing Copilot-Likes toolset..."
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
-
-apt-get install -y \
+apt-get install -y --no-install-recommends \
   ripgrep \
   fd-find \
   fzf \
@@ -16,6 +15,9 @@ apt-get install -y \
   bat \
   git-delta \
   direnv
+
+apt-get clean
+rm -rf /var/lib/apt/lists/*
 
 # ---- Fix Ubuntu naming quirks ----
 ln -sf /usr/bin/fdfind /usr/local/bin/fd || true

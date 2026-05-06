@@ -1,14 +1,12 @@
 version: 2
 
 updates:
-  # Keep GitHub Actions up to date
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
 
-  # (Future-proof) If ever add npm / tooling
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+
+    open-pull-requests-limit: 5
