@@ -37,9 +37,18 @@ jobs:
       - name: Run container and verify installation
         run: |
           devcontainer exec --workspace-folder . bash -c "
-            echo '✅ Checking gh CLI'
-            which gh || exit 1
+            echo '✅ Checking ripgrep'
+            which rg || exit 1
 
-            echo '✅ Checking Copilot extension'
-            ls ~/.vscode-server/extensions | grep copilot || exit 1
+            echo '✅ Checking fd'
+            which fd || exit 1
+
+            echo '✅ Checking jq'
+            which jq || exit 1
+
+            echo '✅ Checking bat'
+            which bat || which batcat || exit 1
+
+            echo '✅ Checking eza'
+            which eza || exit 1
           "
