@@ -1,0 +1,10 @@
+{
+  "id": "copilot-likes",
+  "version": "1.0.0",
+  "name": "Copilot Likes",
+  "description": "Opinionated tools and tweaks that GitHub Copilot tends to expect.",
+  "documentationURL": "https://github.com/markheydon/devcontainer-features/tree/main/src/copilot-likes",
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ]
+}
