@@ -1,4 +1,4 @@
-name: Publish Devcontainer Features
+name: Publish Features
 
 on:
   push:
