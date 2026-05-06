@@ -29,6 +29,7 @@ jobs:
         with:
           publish-features: "true"
           base-path-to-features: "./src"
+          generate-docs: "true"
           oci-registry: ghcr.io
           features-namespace: ${{ github.repository_owner }}/devcontainer-features
         env:
