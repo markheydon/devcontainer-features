@@ -1,0 +1,45 @@
+name: Test Published Feature
+
+on:
+  workflow_run:
+    workflows: ["Publish Features"]
+    types:
+      - completed
+
+jobs:
+  test-feature:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Create test devcontainer.json
+        run: |
+          mkdir -p .devcontainer
+          cat > .devcontainer/devcontainer.json << 'EOF'
+          {
+            "name": "Test Feature",
+            "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+            "features": {
+              "ghcr.io/${{ github.repository_owner }}/devcontainer-features/copilot-likes:latest": {}
+            }
+          }
+          EOF
+
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Build container with feature
+        run: devcontainer build --workspace-folder .
+
+      - name: Run container and verify installation
+        run: |
+          devcontainer exec --workspace-folder . bash -c "
+            echo '✅ Checking gh CLI'
+            which gh || exit 1
+
+            echo '✅ Checking Copilot extension'
+            ls ~/.vscode-server/extensions | grep copilot || exit 1
+          "
