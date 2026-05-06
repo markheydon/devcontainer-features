@@ -1,0 +1,7 @@
+{
+  "name": "Devcontainer Features Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "./src/copilot-likes": {}
+  }
+}
