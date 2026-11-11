@@ -62,7 +62,7 @@ Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need re
 }
 ```
 
-With `managedPython: auto`, a 3.11+ `python3` from the Python feature skips a second interpreter install.
+With `managedPython: auto`, a 3.11+ `python3` with a working stdlib from the Python feature skips a second interpreter install.
 
 Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils runs before this feature when both are in the `features` block. The Dev Containers CLI treats that as a **soft dependency**: if common-utils is not listed, install order still resolves and this feature installs on its own. On pre-built Microsoft bases you can omit common-utils; see the root [README.md](../../README.md#using-a-feature).
 
@@ -74,6 +74,20 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 | `uvVersion` | `0.13.7` | uv GitHub release tag (no leading `v`). |
 | `managedPython` | `auto` | `auto` skips managed Python when `python3` is 3.11+ with a working stdlib; `always` \| `never` — see install script behaviour above. |
 | `pythonVersion` | `3.12` | Version passed to `uv python install` when managed Python runs. |
+
+## Container environment
+
+Feature metadata sets these variables so uv keeps tools, interpreters, and caches under `/opt/uv` while exposing binaries on `PATH` via `/usr/local/bin`:
+
+| Variable | Value |
+|----------|-------|
+| `UV_TOOL_DIR` | `/opt/uv/tools` |
+| `UV_TOOL_BIN_DIR` | `/usr/local/bin` |
+| `UV_PYTHON_INSTALL_DIR` | `/opt/uv/python` |
+| `UV_PYTHON_BIN_DIR` | `/usr/local/bin` |
+| `UV_CACHE_DIR` | `/opt/uv/cache` |
+
+When managed Python runs and the Dev Containers lifecycle provides `_REMOTE_USER_HOME`, the install script writes `${_REMOTE_USER_HOME}/.config/uv/.python-version` so the container user’s uv commands prefer the pinned interpreter.
 
 ## After the container builds
 
