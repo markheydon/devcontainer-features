@@ -83,7 +83,7 @@ shellcheck src/**/install.sh
 | `copilot-likes` | `rg`, `fd`, `jq`, `bat`/`batcat`, `eza`, `fzf`, `tree`, `direnv`, `delta` | Profile aliases and `/etc/profile.d` behaviour (not executed in non-login `which` checks) |
 | `spec-kit` | `uv`, `specify`, `specify version`, Python ≥3.11 via `uv run` | `uvx`, uv-managed Python when base `python3` < 3.11 (covered indirectly by `specify`) |
 
-When adding tools to a feature, add matching assertions to `test.yml` (or a feature-specific job later if the repo grows).
+When adding tools to a feature, add matching assertions to `test/<feature-id>/test.sh` and keep the post-publish smoke jobs in [test.yml](.github/workflows/test.yml) in sync (or a feature-specific job later if the repo grows).
 
 Official Microsoft base images for install testing are listed in [scripts/official-base-images.txt](scripts/official-base-images.txt) (keep [feature-test.yml](.github/workflows/feature-test.yml) in sync). Probe apt/Yarn/`git-delta` behaviour on those images without installing a feature:
 
