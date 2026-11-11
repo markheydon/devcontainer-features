@@ -9,8 +9,8 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
 | Component | How |
 |-----------|-----|
 | **uv** | Pinned release tarball from [astral-sh/uv](https://github.com/astral-sh/uv) → `/usr/local/bin` |
-| **Python 3.11+** | When `managedPython` is `auto` or `always` and `python3` on `PATH` is older than 3.11 (or missing), via `uv python install` |
-| **specify** | PyPI package `specify-cli` via `uv tool install` → `/usr/local/bin` |
+| **Python 3.11+** | When `managedPython` is `auto` or `always` and `python3` on `PATH` is older than 3.11 (or missing), via `uv python install` into `/opt/uv/python` (executables linked under `/usr/local/bin`) |
+| **specify** | PyPI package `specify-cli` via `uv tool install`; tool environment under `/opt/uv/tools`, executable in `/usr/local/bin` (usable by the container user, not only `root`) |
 
 `apt`: `ca-certificates`, `curl` (for downloads).
 

@@ -10,8 +10,11 @@ UVVERSION="${UVVERSION:-0.13.7}"
 MANAGEDPYTHON="${MANAGEDPYTHON:-auto}"
 PYTHONVERSION="${PYTHONVERSION:-3.12}"
 
-UV_TOOL_BIN_DIR="/usr/local/bin"
-export UV_TOOL_BIN_DIR
+UV_PREFIX="/opt/uv"
+export UV_TOOL_DIR="${UV_PREFIX}/tools"
+export UV_TOOL_BIN_DIR="/usr/local/bin"
+export UV_PYTHON_INSTALL_DIR="${UV_PREFIX}/python"
+export UV_PYTHON_BIN_DIR="/usr/local/bin"
 
 apt-get update
 apt-get install -y --no-install-recommends ca-certificates curl
@@ -99,13 +102,36 @@ ensure_python() {
     esac
 
     if [[ "${need_install}" -eq 1 ]]; then
+        mkdir -p "${UV_PYTHON_INSTALL_DIR}"
         echo "Installing Python ${PYTHONVERSION} via uv..."
         uv python install "${PYTHONVERSION}"
-        uv python pin --global "${PYTHONVERSION}" || true
+        pin_uv_python_version_for_container_user
+    fi
+}
+
+pin_uv_python_version_for_container_user() {
+    if [[ -z "${_REMOTE_USER_HOME:-}" ]]; then
+        return 0
+    fi
+    local uv_config="${_REMOTE_USER_HOME}/.config/uv"
+    mkdir -p "${uv_config}"
+    echo "${PYTHONVERSION}" >"${uv_config}/.python-version"
+    if [[ -n "${_REMOTE_USER:-}" && "${_REMOTE_USER}" != "root" ]]; then
+        chown -R "${_REMOTE_USER}:${_REMOTE_USER}" "${uv_config}" 2>/dev/null || true
+    fi
+}
+
+fix_shared_uv_permissions() {
+    mkdir -p "${UV_TOOL_DIR}" "${UV_PYTHON_INSTALL_DIR}"
+    chmod -R a+rX "${UV_PREFIX}"
+
+    if [[ -n "${_REMOTE_USER:-}" && "${_REMOTE_USER}" != "root" ]]; then
+        chown -R "${_REMOTE_USER}:${_REMOTE_USER}" "${UV_PREFIX}" 2>/dev/null || true
     fi
 }
 
 install_specify() {
+    mkdir -p "${UV_TOOL_DIR}"
     local package="specify-cli"
     if [[ "${SPECIFYVERSION}" == "latest" ]]; then
         echo "Installing specify-cli (latest from PyPI)..."
@@ -119,6 +145,7 @@ install_specify() {
 install_uv
 ensure_python
 install_specify
+fix_shared_uv_permissions
 
 specify version
 
