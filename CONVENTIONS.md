@@ -64,7 +64,7 @@ shellcheck src/**/install.sh
 
 ## Versioning and publishing
 
-- Consumer reference shape: `ghcr.io/<owner>/devcontainer-features/<feature-id>:<version>` or `:latest` after publish to `main`.
+- Consumer reference shape: `ghcr.io/<owner>/devcontainer-features/<feature-id>:<version>` after publish to `main`. Prefer the major alias (`:1`) in README examples; pin exact semver only when documenting reproducibility.
 - Do not change `features-namespace` or registry layout without explicit maintainer instruction.
 - Metadata validation uses `base-path-to-features: "./src"` in workflows.
 
@@ -102,7 +102,7 @@ Feature packaging and metadata validation also run in CI ([validate.yml](.github
 
 - UK English in docs and comments.
 - Keep the root README feature list in sync with folders under `src/`.
-- Per-feature README: what gets installed, why, and any caveats (architecture, `installsAfter`).
+- Per-feature README: what gets installed, why, and any caveats (architecture, `installsAfter`). Consumer `devcontainer.json` examples use GHCR major tags (`:1`), not patch semver, unless the text is about pinning.
 
 See `.agents/skills/project-documentation/` for placement guidance.
 

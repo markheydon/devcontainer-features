@@ -29,18 +29,38 @@ Opinionated Dev Container feature with CLI tools and small UX defaults that GitH
 
 ## Consumer `devcontainer.json`
 
-Published reference (pin semver or use a major-version tag after publish):
+Published reference: use the major tag `:1` unless you need a pinned semver (see the root [README](../../README.md#using-a-feature)).
+
+**Microsoft dev container base (recommended):** the base this repo uses in its [maintainer dev container](../../.devcontainer/README.md) already includes [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils).
 
 ```json
 {
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.1": {}
+    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {}
   }
 }
 ```
 
-This feature’s metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils). Include it (or an equivalent base feature your image already provides) so install order is valid.
+**Plain or minimal base:** list common-utils when your image does not already provide it:
+
+```json
+{
+  "image": "ubuntu:24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {}
+  }
+}
+```
+
+### `installsAfter` and common-utils
+
+Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils is applied before this feature when both appear in your `features` block. The Dev Containers CLI treats that as a **soft dependency**: if common-utils is not listed, install order still resolves and this feature installs on its own.
+
+Omit common-utils when your base is a pre-built Microsoft dev container image (they are [built with common-utils](https://github.com/devcontainers/images/blob/main/src/base-ubuntu/.devcontainer/devcontainer.json)). Re-applying common-utils on top of such images is usually redundant and can fail if you force UID/GID 1000 again—see [Using with dev container images](https://github.com/devcontainers/features/blob/main/src/common-utils/README.md#using-with-dev-container-images) in the upstream feature docs.
+
+For the shared rule across features in this repository, see [README.md](../../README.md#using-a-feature).
 
 ## Caveats
 

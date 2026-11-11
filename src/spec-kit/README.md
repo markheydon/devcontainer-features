@@ -22,7 +22,7 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
 {
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.1": {
+    "ghcr.io/markheydon/devcontainer-features/spec-kit:1": {
       "specifyVersion": "latest"
     }
   }
@@ -38,7 +38,7 @@ Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need re
   "image": "ubuntu:24.04",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.1": {
+    "ghcr.io/markheydon/devcontainer-features/spec-kit:1": {
       "specifyVersion": "latest"
     }
   }
@@ -54,7 +54,7 @@ Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need re
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.12"
     },
-    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.1": {
+    "ghcr.io/markheydon/devcontainer-features/spec-kit:1": {
       "specifyVersion": "latest",
       "managedPython": "auto"
     }
@@ -64,7 +64,7 @@ Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need re
 
 With `managedPython: auto`, a 3.11+ `python3` from the Python feature skips a second interpreter install.
 
-Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils runs before this feature when both are in the `features` block. On pre-built Microsoft bases you can omit common-utils; see the root [README.md](../../README.md#using-a-feature).
+Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils runs before this feature when both are in the `features` block. The Dev Containers CLI treats that as a **soft dependency**: if common-utils is not listed, install order still resolves and this feature installs on its own. On pre-built Microsoft bases you can omit common-utils; see the root [README.md](../../README.md#using-a-feature).
 
 ## Options
 
