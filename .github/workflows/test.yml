@@ -68,3 +68,47 @@ jobs:
             echo '✅ Checking delta'
             which delta || exit 1
           "
+
+  test-spec-kit:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Create test devcontainer.json
+        run: |
+          mkdir -p .devcontainer
+          cat > .devcontainer/devcontainer.json << 'EOF'
+          {
+            "name": "Test Spec Kit Feature",
+            "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+            "features": {
+              "ghcr.io/devcontainers/features/common-utils:2": {},
+              "ghcr.io/${{ github.repository_owner }}/devcontainer-features/spec-kit:latest": {}
+            }
+          }
+          EOF
+
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Start dev container
+        run: devcontainer up --workspace-folder .
+
+      - name: Run container and verify installation
+        run: |
+          devcontainer exec --workspace-folder . bash -c "
+            echo '✅ Checking uv'
+            which uv || exit 1
+
+            echo '✅ Checking specify'
+            which specify || exit 1
+
+            echo '✅ Checking specify version'
+            specify version || exit 1
+
+            echo '✅ Checking Python 3.11+ via uv'
+            uv run --python 3.12 python -c 'import sys; assert sys.version_info >= (3, 11)' || exit 1
+          "

@@ -1,0 +1,36 @@
+{
+  "id": "spec-kit",
+  "version": "1.0.0",
+  "name": "Spec Kit",
+  "description": "Self-contained GitHub Spec Kit toolchain: uv, Python 3.11+ when needed, and the Specify CLI (specify-cli). No VS Code Python extensions.",
+  "documentationURL": "https://github.com/markheydon/devcontainer-features/tree/main/src/spec-kit",
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ],
+  "options": {
+    "specifyVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "PyPI version of specify-cli, or latest to install or upgrade to the current PyPI release on each image build."
+    },
+    "uvVersion": {
+      "type": "string",
+      "default": "0.13.7",
+      "description": "uv release version to install from GitHub (semver tag without a leading v)."
+    },
+    "managedPython": {
+      "type": "string",
+      "proposals": ["auto", "always", "never"],
+      "default": "auto",
+      "description": "When to run uv python install: auto skips if python3 is already 3.11+; always installs; never requires an existing 3.11+ python3."
+    },
+    "pythonVersion": {
+      "type": "string",
+      "default": "3.12",
+      "description": "Python version for uv python install when managed Python runs."
+    }
+  },
+  "containerEnv": {
+    "PATH": "/usr/local/bin:${PATH}"
+  }
+}

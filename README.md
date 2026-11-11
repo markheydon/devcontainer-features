@@ -28,6 +28,7 @@ Some features declare `installsAfter` in metadata (for example **copilot-likes**
 | Feature | Description |
 |---------|-------------|
 | [copilot-likes](src/copilot-likes/README.md) | Opinionated CLI tools, git diff defaults, and shell aliases that match what many agent-assisted workflows assume are present |
+| [spec-kit](src/spec-kit/README.md) | Self-contained GitHub Spec Kit toolchain (uv, Python when needed, Specify CLI) without VS Code Python extensions |
 
 ## Contributing
 
