@@ -68,5 +68,6 @@ When install behaviour changes:
 
 - Bump the feature `version` in `devcontainer-feature.json`.
 - Extend assertions in `test/<feature-id>/test.sh` and keep post-publish smoke jobs in [test.yml](.github/workflows/test.yml) in sync.
+- For **spec-kit** postCreate sync, keep [test/spec-kit/sync-target-version.txt](test/spec-kit/sync-target-version.txt) valid for downgrade sync tests (documented in [src/spec-kit/README.md](src/spec-kit/README.md#testing)).
 
 All agent-authored pull requests require human review before merge.

@@ -85,6 +85,8 @@ shellcheck src/**/install.sh
 
 When adding tools to a feature, add matching assertions to `test/<feature-id>/test.sh` and keep the post-publish smoke jobs in [test.yml](.github/workflows/test.yml) in sync (or a feature-specific job later if the repo grows).
 
+**spec-kit postCreate sync:** Feature tests exercise downgrade sync via `test/spec-kit/sync-target-version.txt`. [scripts/test-features.sh](scripts/test-features.sh) passes that value as `SPEC_KIT_SYNC_TARGET_VERSION` and sets `PYTHONVERSION` to match the feature’s `pythonVersion` default (keep both in sync with [src/spec-kit/devcontainer-feature.json](src/spec-kit/devcontainer-feature.json)). The post-publish smoke job reads the same pin into `.specify/init-options.json`. If PyPI `latest` drifts, update the pin — see [src/spec-kit/README.md](src/spec-kit/README.md#testing).
+
 Official Microsoft base images for install testing are listed in [scripts/official-base-images.txt](scripts/official-base-images.txt) (keep [feature-test.yml](.github/workflows/feature-test.yml) in sync). Probe apt/Yarn/`git-delta` behaviour on those images without installing a feature:
 
 ```bash

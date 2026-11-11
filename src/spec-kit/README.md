@@ -91,7 +91,7 @@ When managed Python runs and the Dev Containers lifecycle provides `_REMOTE_USER
 
 ## After the container builds
 
-This feature does **not** run `specify init`. With `specifyVersion: latest` (the default), a `postCreateCommand` installs `speckit_version` from `.specify/init-options.json` when that file is present so the container CLI matches the Spec Kit version already in the repo. Initialise or upgrade projects yourself, for example:
+This feature does **not** run `specify init`. With `specifyVersion: latest` (the default), a `postCreateCommand` runs `/usr/local/share/spec-kit/sync-specify-version.sh`. When `.specify/init-options.json` defines `speckit_version` and the installed CLI differs, the script reinstalls `specify-cli` at that version so the container matches the repo. Sync only runs when `specifyVersion` was `latest` at image build. The script is generated at install time with your `managedPython` and `pythonVersion` options, so create-time reinstall uses the same Python selection rules as the initial install. Initialise or upgrade projects yourself, for example:
 
 ```bash
 specify init my-project --integration copilot
