@@ -24,7 +24,7 @@ Developers need small, opinionated Dev Container features that complement offici
 ## Success Looks Like
 
 - New features follow the `src/<id>/` layout and pass validate, ShellCheck, publish, and smoke test.
-- README and per-feature READMEs list what is installed and why.
+- Root README and per-feature READMEs list what is installed, consumer references (including `installsAfter`), and caveats.
 - Consumers can pin versions or use `latest` without surprise breaking changes undocumented in release notes or version bumps.
 
 ---

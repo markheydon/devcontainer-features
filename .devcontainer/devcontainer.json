@@ -2,6 +2,7 @@
   "name": "Devcontainer Features Dev",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
     "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {},
     "ghcr.io/devcontainers-extra/features/shellcheck:1": {},
     "ghcr.io/devcontainers/features/node:1": {

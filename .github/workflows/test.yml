@@ -26,6 +26,7 @@ jobs:
             "name": "Test Feature",
             "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
             "features": {
+              "ghcr.io/devcontainers/features/common-utils:2": {},
               "ghcr.io/${{ github.repository_owner }}/devcontainer-features/copilot-likes:latest": {}
             }
           }
@@ -54,4 +55,16 @@ jobs:
 
             echo '✅ Checking eza'
             which eza || exit 1
+
+            echo '✅ Checking fzf'
+            which fzf || exit 1
+
+            echo '✅ Checking tree'
+            which tree || exit 1
+
+            echo '✅ Checking direnv'
+            which direnv || exit 1
+
+            echo '✅ Checking delta'
+            which delta || exit 1
           "
