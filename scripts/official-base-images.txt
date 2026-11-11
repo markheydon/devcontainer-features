@@ -1,0 +1,7 @@
+# Official Microsoft dev container images used for probe and feature tests.
+# One image reference per line; blank lines and # comments are ignored.
+mcr.microsoft.com/devcontainers/base:ubuntu
+mcr.microsoft.com/devcontainers/php:latest
+mcr.microsoft.com/devcontainers/dotnet:latest
+mcr.microsoft.com/devcontainers/python:latest
+mcr.microsoft.com/devcontainers/javascript-node:latest

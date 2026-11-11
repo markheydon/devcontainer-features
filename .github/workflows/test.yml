@@ -26,7 +26,6 @@ jobs:
             "name": "Test Feature",
             "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
             "features": {
-              "ghcr.io/devcontainers/features/common-utils:2": {},
               "ghcr.io/${{ github.repository_owner }}/devcontainer-features/copilot-likes:latest": {}
             }
           }
@@ -37,44 +36,17 @@ jobs:
 
       - name: Start dev container
         run: devcontainer up --workspace-folder .
-  
+
       - name: Run container and verify installation
         run: |
-          devcontainer exec --workspace-folder . bash -c "
-            echo '✅ Checking ripgrep'
-            which rg || exit 1
-
-            echo '✅ Checking fd'
-            which fd || exit 1
-
-            echo '✅ Checking jq'
-            which jq || exit 1
-
-            echo '✅ Checking bat'
-            which bat || which batcat || exit 1
-
-            echo '✅ Checking eza'
-            which eza || exit 1
-
-            echo '✅ Checking fzf'
-            which fzf || exit 1
-
-            echo '✅ Checking tree'
-            which tree || exit 1
-
-            echo '✅ Checking direnv'
-            which direnv || exit 1
-
-            echo '✅ Checking delta'
-            which delta || exit 1
-          "
+          devcontainer exec --workspace-folder . bash test/copilot-likes/test.sh
 
   test-spec-kit:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     env:
       # Keep in sync with src/spec-kit/devcontainer-feature.json pythonVersion default
-      SPEC_KIT_PYTHON_VERSION: "3.12"
+      PYTHONVERSION: "3.12"
 
     steps:
       - name: Checkout
@@ -88,9 +60,8 @@ jobs:
             "name": "Test Spec Kit Feature",
             "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
             "features": {
-              "ghcr.io/devcontainers/features/common-utils:2": {},
               "ghcr.io/${{ github.repository_owner }}/devcontainer-features/spec-kit:latest": {
-                "pythonVersion": "${SPEC_KIT_PYTHON_VERSION}"
+                "pythonVersion": "3.12"
               }
             }
           }
@@ -104,16 +75,4 @@ jobs:
 
       - name: Run container and verify installation
         run: |
-          devcontainer exec --workspace-folder . bash -c "
-            echo '✅ Checking uv'
-            which uv || exit 1
-
-            echo '✅ Checking specify'
-            which specify || exit 1
-
-            echo '✅ Checking specify version'
-            specify version || exit 1
-
-            echo '✅ Checking Python 3.11+ via uv'
-            uv run --python ${SPEC_KIT_PYTHON_VERSION} python -c 'import sys; assert sys.version_info >= (3, 11)' || exit 1
-          "
+          devcontainer exec --workspace-folder . bash test/spec-kit/test.sh

@@ -16,4 +16,16 @@ The base image `mcr.microsoft.com/devcontainers/base:ubuntu` already includes [c
 
 **Host requirement:** Docker must be available on the machine (or VM) that forwards the socket—typical on local Dev Containers with Docker Desktop. Without Docker, ShellCheck and editing still work; feature build/test commands need the socket.
 
+### Feature tests inside this dev container
+
+This image uses **docker-outside-of-docker**: the `devcontainer features test` command can **build and install** a feature successfully, then fail launching the test container because it bind-mounts a path under `/tmp` that exists only inside this dev container, not on the Docker host.
+
+Use the repo helper instead of calling the CLI directly:
+
+```bash
+./scripts/test-features.sh
+```
+
+It mirrors CI coverage (every `src/*` feature × every image in [scripts/official-base-images.txt](../scripts/official-base-images.txt)) and falls back to running `test/<feature-id>/test.sh` inside the built image when the CLI bind mount fails.
+
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for commands to run before a PR.
