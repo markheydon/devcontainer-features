@@ -37,7 +37,7 @@ Published reference (pin semver or use a major-version tag after publish).
 {
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.1": {}
+    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.2": {}
   }
 }
 ```
@@ -49,7 +49,7 @@ Published reference (pin semver or use a major-version tag after publish).
   "image": "ubuntu:24.04",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.1": {}
+    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.2": {}
   }
 }
 ```

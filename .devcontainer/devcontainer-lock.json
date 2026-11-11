@@ -26,9 +26,9 @@
       "integrity": "sha256:a4e321fcd89ea7fe6b1eea98e98f5ccc47d4be525fcfa4299cccf2c6aafefa21"
     },
     "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {
-      "version": "1.0.0",
-      "resolved": "ghcr.io/markheydon/devcontainer-features/copilot-likes@sha256:00707d0886649a89871d031af818e13962b46787a2dc62507d4036edf6d114a7",
-      "integrity": "sha256:00707d0886649a89871d031af818e13962b46787a2dc62507d4036edf6d114a7"
+      "version": "1.0.1",
+      "resolved": "ghcr.io/markheydon/devcontainer-features/copilot-likes@sha256:774c7aeb01330eac006c3f70c9e6d8dcf4d587a1786fb35ac8c35d57e735d43e",
+      "integrity": "sha256:774c7aeb01330eac006c3f70c9e6d8dcf4d587a1786fb35ac8c35d57e735d43e"
     },
     "ghcr.io/stu-bell/devcontainer-features/cursor-cli:0": {
       "version": "0.1.0",

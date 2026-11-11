@@ -64,7 +64,7 @@ Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need re
 
 With `managedPython: auto`, a 3.11+ `python3` from the Python feature skips a second interpreter install.
 
-Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils runs before this feature when both are in the `features` block. On pre-built Microsoft bases you can omit common-utils; see the root [README.md](../../README.md#using-a-feature).
+Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils runs before this feature when both are in the `features` block. The Dev Containers CLI treats that as a **soft dependency**: if common-utils is not listed, install order still resolves and this feature installs on its own. On pre-built Microsoft bases you can omit common-utils; see the root [README.md](../../README.md#using-a-feature).
 
 ## Options
 

@@ -13,11 +13,11 @@ Reference a published image after merge to `main`:
 
 ```json
 "features": {
-  "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.1": {}
+  "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.2": {}
 }
 ```
 
-Registry tags include the semver from `devcontainer-feature.json` (for example `1.0.0`) and, after publish, a major-version alias such as `:1`. Pin an exact semver if you need reproducible builds; use `:latest` or a major tag only if your team accepts floating updates.
+Registry tags include the semver from `devcontainer-feature.json` (for example `1.0.2`) and, after publish, a major-version alias such as `:1`. Pin an exact semver if you need reproducible builds; use `:latest` or a major tag only if your team accepts floating updates.
 
 While developing in this repository, point at a local feature folder instead of GHCR — see [CONTRIBUTING.md](CONTRIBUTING.md#testing-locally).
 
