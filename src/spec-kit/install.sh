@@ -144,7 +144,9 @@ pin_uv_python_version_for_container_user() {
     mkdir -p "${uv_config}"
     echo "${PYTHONVERSION}" >"${uv_config}/.python-version"
     if [[ -n "${_REMOTE_USER:-}" && "${_REMOTE_USER}" != "root" ]]; then
-        chown -R "${_REMOTE_USER}:${_REMOTE_USER}" "${uv_config}" 2>/dev/null || true
+        if ! chown -R "${_REMOTE_USER}:${_REMOTE_USER}" "${uv_config}"; then
+            echo "Warning: could not chown ${uv_config} to ${_REMOTE_USER}." >&2
+        fi
     fi
 }
 
@@ -152,7 +154,9 @@ fix_shared_uv_permissions() {
     mkdir -p "${UV_TOOL_DIR}" "${UV_PYTHON_INSTALL_DIR}" "${UV_CACHE_DIR}"
     local user
     if user="$(container_user_name)"; then
-        chown -R "${user}:${user}" "${UV_PREFIX}" 2>/dev/null || true
+        if ! chown -R "${user}:${user}" "${UV_PREFIX}"; then
+            echo "Warning: could not chown ${UV_PREFIX} to ${user}; relying on group-writable permissions." >&2
+        fi
     fi
     chmod -R a+rwX "${UV_PREFIX}"
 }
@@ -174,9 +178,10 @@ install_specify() {
 
 install_uv
 ensure_python
-install_specify
 fix_shared_uv_permissions
+install_specify
 
 specify version
+fix_shared_uv_permissions
 
 echo "✅ Spec Kit installed."

@@ -9,7 +9,7 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
 | Component | How |
 |-----------|-----|
 | **uv** | Pinned release tarball from [astral-sh/uv](https://github.com/astral-sh/uv) → `/usr/local/bin` |
-| **Python 3.11+** | When `managedPython` is `auto` or `always` and `python3` on `PATH` is older than 3.11 (or missing), via `uv python install` into `/opt/uv/python` (executables linked under `/usr/local/bin`) |
+| **Python 3.11+** | When `managedPython` is `auto` or `always` and `python3` on `PATH` is missing, older than 3.11, or lacks a working stdlib, via `uv python install` into `/opt/uv/python` (executables linked under `/usr/local/bin`) |
 | **specify** | PyPI package `specify-cli` via `uv tool install`; tool environment under `/opt/uv/tools`, executable in `/usr/local/bin` (usable by the container user, not only `root`) |
 
 `apt`: `ca-certificates`, `curl` (for downloads).
@@ -72,7 +72,7 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 |--------|---------|-------------|
 | `specifyVersion` | `latest` | PyPI version of `specify-cli`, or `latest` to upgrade on each image build (`uv tool install --force`). |
 | `uvVersion` | `0.13.7` | uv GitHub release tag (no leading `v`). |
-| `managedPython` | `auto` | `auto` \| `always` \| `never` — see install script behaviour above. |
+| `managedPython` | `auto` | `auto` skips managed Python when `python3` is 3.11+ with a working stdlib; `always` \| `never` — see install script behaviour above. |
 | `pythonVersion` | `3.12` | Version passed to `uv python install` when managed Python runs. |
 
 ## After the container builds
@@ -95,6 +95,7 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 - `specifyVersion: latest` rebuilds may pick up a newer CLI; pin semver for reproducibility.
 - Do **not** combine with `ghcr.io/devcontainers-extra/features/uv`; this feature already installs uv.
 - Air-gapped environments: pin `specifyVersion` and `uvVersion`, or follow [Spec Kit air-gapped guidance](https://github.github.io/spec-kit/install/air-gapped.html).
+- `/opt/uv` is world-writable (`chmod a+rwX`) so a single dev user can share uv caches and tools; avoid combining with unrelated Unix accounts in one container if you need strict filesystem isolation.
 - Supported uv tarball architectures: `x86_64`, `aarch64`, `armv7l`. On `armv7l`, `specify-cli` still installs from PyPI wheels and may fail if no wheel exists for that platform.
 
 ## Development in this repository
