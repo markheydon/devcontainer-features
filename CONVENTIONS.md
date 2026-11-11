@@ -38,7 +38,7 @@ There is no top-level `docs/` folder yet. Use the root README, CONTRIBUTING, and
 - **`version`:** Semver. Bump on any change to install-time behaviour (packages added/removed, scripts, architecture handling).
 - **`name` / `description`:** User-facing; UK English.
 - **`documentationURL`:** Points at this repo tree path for the feature.
-- **`installsAfter`:** Declare ordering when another feature must run first (for example `common-utils`).
+- **`installsAfter`:** Declare ordering when another feature must run first (for example `common-utils`). Keep this in metadata even when many consumers can omit the dependency. In the feature README, state when consumers **must** add the named feature (plain or minimal bases) and when they **may omit** it (pre-built `devcontainers/*` images that already include common-utils). Do not remove `installsAfter` from JSON to “simplify” consumer configs.
 
 ---
 
@@ -79,6 +79,7 @@ shellcheck src/**/install.sh
 | Feature | Asserted in `test.yml` | Installed but not asserted in CI (document in feature README) |
 |---------|------------------------|------------------------------------------------------------------|
 | `copilot-likes` | `rg`, `fd`, `jq`, `bat`/`batcat`, `eza`, `fzf`, `tree`, `direnv`, `delta` | Profile aliases and `/etc/profile.d` behaviour (not executed in non-login `which` checks) |
+| `spec-kit` | `uv`, `specify`, `specify version`, Python ≥3.11 via `uv run` | `uvx`, uv-managed Python when base `python3` < 3.11 (covered indirectly by `specify`) |
 
 When adding tools to a feature, add matching assertions to `test.yml` (or a feature-specific job later if the repo grows).
 

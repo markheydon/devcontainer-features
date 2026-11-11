@@ -21,13 +21,14 @@ Registry tags include the semver from `devcontainer-feature.json` (for example `
 
 While developing in this repository, point at a local feature folder instead of GHCR — see [CONTRIBUTING.md](CONTRIBUTING.md#testing-locally).
 
-Some features declare `installsAfter` in metadata (for example **copilot-likes** expects [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils)). Add those dependencies to your `features` block when the feature README or JSON metadata says so.
+Some features declare `installsAfter` in metadata (for example **copilot-likes** and **spec-kit** list [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils)). List that dependency in your `features` block **only when your base image does not already include it**. Official Microsoft dev container images such as [`mcr.microsoft.com/devcontainers/base:ubuntu`](https://github.com/devcontainers/images/blob/main/src/base-ubuntu/README.md) are built with common-utils already applied; listing it again adds an extra feature layer with little benefit. If you omit the dependency, the Dev Containers CLI still resolves install order—it treats `installsAfter` as a soft dependency when the named feature is not requested. See each feature README for examples.
 
 ## Features
 
 | Feature | Description |
 |---------|-------------|
 | [copilot-likes](src/copilot-likes/README.md) | Opinionated CLI tools, git diff defaults, and shell aliases that match what many agent-assisted workflows assume are present |
+| [spec-kit](src/spec-kit/README.md) | Self-contained GitHub Spec Kit toolchain (uv, Python when needed, Specify CLI) without VS Code Python extensions |
 
 ## Contributing
 
