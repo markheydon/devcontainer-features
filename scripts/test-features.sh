@@ -124,11 +124,16 @@ run_combo() {
   label="$(short_image_label "${base_image}")"
   echo "  .. ${feature} @ ${label}"
 
+  local -a cli_quiet=()
+  if [[ "${GITHUB_ACTIONS:-}" != "true" ]]; then
+    cli_quiet=(-q)
+  fi
+
   set +e
   devcontainer features test \
     --skip-scenarios \
     --skip-duplicated \
-    -q \
+    "${cli_quiet[@]}" \
     -f "${feature}" \
     -i "${base_image}" \
     "${REPO_ROOT}" >"${log}" 2>&1

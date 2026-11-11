@@ -34,9 +34,6 @@ jobs:
 
       - name: Test ${{ matrix.feature }} on ${{ matrix.baseImage }}
         run: |
-          devcontainer features test \
-            --skip-scenarios \
-            --skip-duplicated \
-            -f "${{ matrix.feature }}" \
-            -i "${{ matrix.baseImage }}" \
-            .
+          ./scripts/test-features.sh \
+            "${{ matrix.feature }}" \
+            "${{ matrix.baseImage }}"

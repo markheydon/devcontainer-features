@@ -26,7 +26,7 @@ CI workflows live under `.github/workflows/`:
 | `validate.yml` | `devcontainers/action` validate-only on PR and `main` |
 | `lint.yml` | ShellCheck on install scripts |
 | `publish.yml` | Publish features to GHCR on push to `main` |
-| `feature-test.yml` | On PR and `main`, `devcontainer features test` for each feature on official base images |
+| `feature-test.yml` | On PR and `main`, `./scripts/test-features.sh` per feature × base image (matrix; subset of [scripts/official-base-images.txt](scripts/official-base-images.txt)) |
 | `test.yml` | After successful publish, `devcontainer up` and verify tools |
 
 There is no top-level `docs/` folder yet. Use the root README, CONTRIBUTING, and per-feature READMEs. Publish may generate OCI feature documentation when `generate-docs` is enabled.
@@ -75,7 +75,7 @@ shellcheck src/**/install.sh
 
 - **Validate:** Caught on every PR via `validate.yml`.
 - **ShellCheck:** Caught on every PR via `lint.yml`.
-- **Feature tests (PR / `main`):** [feature-test.yml](.github/workflows/feature-test.yml) runs `devcontainer features test` for each feature on every image in [scripts/official-base-images.txt](scripts/official-base-images.txt). Assertions live in `test/<feature-id>/test.sh`.
+- **Feature tests (PR / `main`):** [feature-test.yml](.github/workflows/feature-test.yml) runs `./scripts/test-features.sh <feature-id> <base-image>` for each matrix combination. The workflow matrix defines which images CI uses; [scripts/official-base-images.txt](scripts/official-base-images.txt) is the default list for a full local matrix via `./scripts/test-features.sh` with no arguments. Assertions live in `test/<feature-id>/test.sh`.
 - **Smoke test:** After publish, `test.yml` builds a minimal devcontainer that references the published feature and runs the same `test.sh` scripts. The workflow is representative of consumer references (published URI, `latest` tag). Keep the table below in sync when you extend install behaviour or add CI checks.
 
 | Feature | Asserted in `test/<feature-id>/test.sh` | Installed but not asserted in CI (document in feature README) |

@@ -26,6 +26,6 @@ Use the repo helper instead of calling the CLI directly:
 ./scripts/test-features.sh
 ```
 
-It mirrors CI coverage (every `src/*` feature × every image in [scripts/official-base-images.txt](../scripts/official-base-images.txt)) and falls back to running `test/<feature-id>/test.sh` inside the built image when the CLI bind mount fails.
+It is what [feature-test.yml](../.github/workflows/feature-test.yml) runs per matrix job (`<feature-id> <base-image>`). With no arguments it exercises every `src/*` feature × every image in [scripts/official-base-images.txt](../scripts/official-base-images.txt) (often a superset of the CI matrix). In this dev container it falls back to running `test/<feature-id>/test.sh` inside the built image when the CLI bind mount fails.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for commands to run before a PR.

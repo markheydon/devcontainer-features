@@ -44,7 +44,7 @@ Run tests once per changed feature (`feature-id` matches the folder under `src/`
 ./scripts/probe-base-images.sh
 ```
 
-CI runs **feature tests** on every feature against all listed official images ([feature-test.yml](.github/workflows/feature-test.yml)).
+CI runs **feature tests** with the same helper as local checks: `./scripts/test-features.sh <feature-id> <base-image>` for each job in the [feature-test.yml](.github/workflows/feature-test.yml) matrix (a fixed subset of the images in [scripts/official-base-images.txt](scripts/official-base-images.txt)). Run the full local matrix with `./scripts/test-features.sh` and no arguments.
 
 CI also runs:
 

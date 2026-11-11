@@ -62,7 +62,7 @@ shellcheck src/**/install.sh
 
 See [.devcontainer/README.md](.devcontainer/README.md) for maintainer tooling (ShellCheck, Dev Container CLI, host Docker, [scripts/test-features.sh](scripts/test-features.sh)).
 
-On every PR and push to `main`, GitHub Actions runs ShellCheck ([lint.yml](.github/workflows/lint.yml)), feature validation ([validate.yml](.github/workflows/validate.yml)), and feature tests on official base images ([feature-test.yml](.github/workflows/feature-test.yml)). After merge, features publish and the post-publish smoke test workflow runs ([test.yml](.github/workflows/test.yml)).
+On every PR and push to `main`, GitHub Actions runs ShellCheck ([lint.yml](.github/workflows/lint.yml)), feature validation ([validate.yml](.github/workflows/validate.yml)), and [scripts/test-features.sh](scripts/test-features.sh) per job in [feature-test.yml](.github/workflows/feature-test.yml). After merge, features publish and the post-publish smoke test workflow runs ([test.yml](.github/workflows/test.yml)).
 
 When install behaviour changes:
 
