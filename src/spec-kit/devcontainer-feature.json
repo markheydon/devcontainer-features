@@ -1,6 +1,6 @@
 {
   "id": "spec-kit",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "name": "Spec Kit",
   "description": "Self-contained GitHub Spec Kit toolchain: uv, Python 3.11+ when needed, and the Specify CLI (specify-cli). No VS Code Python extensions.",
   "documentationURL": "https://github.com/markheydon/devcontainer-features/tree/main/src/spec-kit",

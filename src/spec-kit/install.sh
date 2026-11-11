@@ -222,19 +222,53 @@ python3_is_healthy() {
         && python3 -c 'import json, shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
 }
 
-sync_tool_python_args() {
+managed_python_requested() {
     case "${MANAGEDPYTHON}" in
-        always)
-            printf '%s\n' --python "${PYTHONVERSION}"
-            ;;
-        never)
-            ;;
+        always) return 0 ;;
+        never) return 1 ;;
         auto)
-            if ! python3_is_healthy; then
-                printf '%s\n' --python "${PYTHONVERSION}"
+            if python3_is_healthy; then
+                return 1
             fi
+            return 0
+            ;;
+        *)
+            echo "sync-specify-version: invalid managedPython value: ${MANAGEDPYTHON} (use auto, always, or never)." >&2
+            return 1
             ;;
     esac
+}
+
+sync_tool_python_args() {
+    if managed_python_requested; then
+        printf '%s\n' --python "${PYTHONVERSION}"
+        return 0
+    fi
+    if ! python3_is_healthy; then
+        echo "sync-specify-version: system python3 is not usable; install managed Python first." >&2
+        return 1
+    fi
+}
+
+run_privileged() {
+    if [[ "$(id -u)" -eq 0 ]]; then
+        "$@"
+        return $?
+    fi
+    if command -v sudo >/dev/null 2>&1; then
+        sudo -E "$@"
+        return $?
+    fi
+    echo "sync-specify-version: root or passwordless sudo is required to reinstall specify-cli." >&2
+    return 1
+}
+
+restore_shared_uv_permissions() {
+    local uv_prefix="/opt/uv"
+    run_privileged mkdir -p "${UV_TOOL_DIR}" "${UV_PYTHON_INSTALL_DIR}" "${UV_CACHE_DIR}"
+    if ! run_privileged chmod -R a+rwX "${uv_prefix}"; then
+        echo "Warning: could not restore shared permissions on ${uv_prefix}." >&2
+    fi
 }
 
 read_repo_speckit_version() {
@@ -282,7 +316,8 @@ echo "Syncing specify-cli to repo version ${repo_version} (image build had ${cur
 python_args=()
 mapfile -t python_args < <(sync_tool_python_args)
 
-uv tool install --force "${python_args[@]}" "specify-cli==${repo_version}"
+run_privileged uv tool install --force "${python_args[@]}" "specify-cli==${repo_version}"
+restore_shared_uv_permissions
 EOF
 
     chmod 755 "${SYNC_SPECIFY_VERSION_SCRIPT}"

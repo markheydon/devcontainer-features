@@ -54,14 +54,18 @@ jobs:
 
       - name: Create test devcontainer.json
         run: |
-          mkdir -p .devcontainer
+          mkdir -p .devcontainer .specify
+          SYNC_PIN="$(tr -d '[:space:]' < test/spec-kit/sync-target-version.txt)"
+          # Pin must stay older than PyPI latest so postCreate reinstalls specify-cli (see src/spec-kit/README.md).
+          echo "{\"speckit_version\": \"${SYNC_PIN}\"}" > .specify/init-options.json
           cat > .devcontainer/devcontainer.json << EOF
           {
             "name": "Test Spec Kit Feature",
             "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
             "features": {
               "ghcr.io/${{ github.repository_owner }}/devcontainer-features/spec-kit:latest": {
-                "pythonVersion": "3.12"
+                "pythonVersion": "3.12",
+                "specifyVersion": "latest"
               }
             }
           }
@@ -75,4 +79,4 @@ jobs:
 
       - name: Run container and verify installation
         run: |
-          devcontainer exec --workspace-folder . bash test/spec-kit/test.sh
+          devcontainer exec --workspace-folder . env SPEC_KIT_SYNC_VERIFY_ONLY=1 bash test/spec-kit/test.sh
