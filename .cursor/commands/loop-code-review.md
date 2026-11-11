@@ -20,7 +20,7 @@ Start the next loop only after steps 2–4 are done (or step 1 returned no signi
 
 Do **not** substitute Bugbot (`/review-bugbot`) or security (`/review-security`) subagent reviews for this loop unless the user asks; the code-review skill describes when to use those instead.
 
-Do **not** substitute `goals-review` for this loop unless the user asks; use [goals-review.md](./goals-review.md) when the question is G1–G4 alignment or feature inventory drift.
+Do **not** substitute `goals-review` for this loop unless the user asks; use [do-goals-review.md](./do-goals-review.md) when the question is G1–G4 alignment or feature inventory drift.
 
 ## Stop condition
 
