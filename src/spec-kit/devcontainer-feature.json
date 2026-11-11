@@ -1,6 +1,6 @@
 {
   "id": "spec-kit",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "Spec Kit",
   "description": "Self-contained GitHub Spec Kit toolchain: uv, Python 3.11+ when needed, and the Specify CLI (specify-cli). No VS Code Python extensions.",
   "documentationURL": "https://github.com/markheydon/devcontainer-features/tree/main/src/spec-kit",
@@ -35,6 +35,7 @@
     "UV_TOOL_DIR": "/opt/uv/tools",
     "UV_TOOL_BIN_DIR": "/usr/local/bin",
     "UV_PYTHON_INSTALL_DIR": "/opt/uv/python",
-    "UV_PYTHON_BIN_DIR": "/usr/local/bin"
+    "UV_PYTHON_BIN_DIR": "/usr/local/bin",
+    "UV_CACHE_DIR": "/opt/uv/cache"
   }
 }

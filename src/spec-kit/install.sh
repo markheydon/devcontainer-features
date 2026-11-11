@@ -15,15 +15,45 @@ export UV_TOOL_DIR="${UV_PREFIX}/tools"
 export UV_TOOL_BIN_DIR="/usr/local/bin"
 export UV_PYTHON_INSTALL_DIR="${UV_PREFIX}/python"
 export UV_PYTHON_BIN_DIR="/usr/local/bin"
+export UV_CACHE_DIR="${UV_PREFIX}/cache"
 
 apt-get update
 apt-get install -y --no-install-recommends ca-certificates curl
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 
-python3_meets_minimum() {
+python3_is_healthy() {
     command -v python3 >/dev/null 2>&1 \
-        && python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+        && python3 -c 'import shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+}
+
+managed_python_requested() {
+    case "${MANAGEDPYTHON}" in
+        always) return 0 ;;
+        never) return 1 ;;
+        auto)
+            if python3_is_healthy; then
+                return 1
+            fi
+            return 0
+            ;;
+        *)
+            echo "Invalid managedPython value: ${MANAGEDPYTHON} (use auto, always, or never)."
+            exit 1
+            ;;
+    esac
+}
+
+container_user_name() {
+    if [[ -n "${_REMOTE_USER:-}" && "${_REMOTE_USER}" != "root" ]]; then
+        printf '%s' "${_REMOTE_USER}"
+        return 0
+    fi
+    if id -u vscode >/dev/null 2>&1; then
+        printf '%s' "vscode"
+        return 0
+    fi
+    return 1
 }
 
 install_uv() {
@@ -74,38 +104,35 @@ install_uv() {
 }
 
 ensure_python() {
-    local need_install=0
+    if [[ "${MANAGEDPYTHON}" == "never" ]]; then
+        if python3_is_healthy; then
+            return 0
+        fi
+        echo "managedPython=never but no usable python3 >= 3.11 found on PATH."
+        echo "Add ghcr.io/devcontainers/features/python or set managedPython to auto."
+        exit 1
+    fi
 
-    case "${MANAGEDPYTHON}" in
-        auto)
-            if python3_meets_minimum; then
-                echo "python3 is already 3.11 or newer; skipping uv python install."
-                return 0
-            fi
-            need_install=1
-            ;;
-        always)
-            need_install=1
-            ;;
-        never)
-            if python3_meets_minimum; then
-                return 0
-            fi
-            echo "managedPython=never but no python3 >= 3.11 found on PATH."
-            echo "Add ghcr.io/devcontainers/features/python or set managedPython to auto."
-            exit 1
-            ;;
-        *)
-            echo "Invalid managedPython value: ${MANAGEDPYTHON} (use auto, always, or never)."
-            exit 1
-            ;;
-    esac
+    if ! managed_python_requested; then
+        echo "python3 is already 3.11+ with a working stdlib; skipping uv python install."
+        return 0
+    fi
 
-    if [[ "${need_install}" -eq 1 ]]; then
-        mkdir -p "${UV_PYTHON_INSTALL_DIR}"
-        echo "Installing Python ${PYTHONVERSION} via uv..."
-        uv python install "${PYTHONVERSION}"
-        pin_uv_python_version_for_container_user
+    mkdir -p "${UV_PYTHON_INSTALL_DIR}"
+    echo "Installing Python ${PYTHONVERSION} via uv..."
+    uv python install "${PYTHONVERSION}"
+    pin_uv_python_version_for_container_user
+}
+
+tool_install_python_args() {
+    if managed_python_requested; then
+        echo --python
+        echo "${PYTHONVERSION}"
+        return 0
+    fi
+    if ! python3_is_healthy; then
+        echo "System python3 is not usable for uv tool install; install managed Python first." >&2
+        exit 1
     fi
 }
 
@@ -122,23 +149,26 @@ pin_uv_python_version_for_container_user() {
 }
 
 fix_shared_uv_permissions() {
-    mkdir -p "${UV_TOOL_DIR}" "${UV_PYTHON_INSTALL_DIR}"
-    chmod -R a+rX "${UV_PREFIX}"
-
-    if [[ -n "${_REMOTE_USER:-}" && "${_REMOTE_USER}" != "root" ]]; then
-        chown -R "${_REMOTE_USER}:${_REMOTE_USER}" "${UV_PREFIX}" 2>/dev/null || true
+    mkdir -p "${UV_TOOL_DIR}" "${UV_PYTHON_INSTALL_DIR}" "${UV_CACHE_DIR}"
+    local user
+    if user="$(container_user_name)"; then
+        chown -R "${user}:${user}" "${UV_PREFIX}" 2>/dev/null || true
     fi
+    chmod -R a+rwX "${UV_PREFIX}"
 }
 
 install_specify() {
     mkdir -p "${UV_TOOL_DIR}"
     local package="specify-cli"
+    local -a python_args=()
+    mapfile -t python_args < <(tool_install_python_args)
+
     if [[ "${SPECIFYVERSION}" == "latest" ]]; then
         echo "Installing specify-cli (latest from PyPI)..."
-        uv tool install --force "${package}"
+        uv tool install --force "${python_args[@]}" "${package}"
     else
         echo "Installing specify-cli==${SPECIFYVERSION}..."
-        uv tool install --force "${package}==${SPECIFYVERSION}"
+        uv tool install --force "${python_args[@]}" "${package}==${SPECIFYVERSION}"
     fi
 }
 
