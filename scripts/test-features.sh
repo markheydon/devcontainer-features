@@ -100,7 +100,9 @@ run_assertions() {
 
   local -a docker_env=()
   if [[ "${feature}" == "spec-kit" ]]; then
-    docker_env=(-e "PYTHONVERSION=3.12")
+    local sync_pin
+    sync_pin="$(tr -d '[:space:]' < "${REPO_ROOT}/test/spec-kit/sync-target-version.txt")"
+    docker_env=(-e "PYTHONVERSION=3.12" -e "SPEC_KIT_SYNC_TARGET_VERSION=${sync_pin}")
   fi
 
   if [[ "${VERBOSE}" == "1" ]]; then

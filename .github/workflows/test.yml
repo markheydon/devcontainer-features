@@ -55,8 +55,9 @@ jobs:
       - name: Create test devcontainer.json
         run: |
           mkdir -p .devcontainer .specify
-          # Older than typical PyPI latest — postCreate must reinstall specify-cli (see test/spec-kit/test.sh).
-          echo '{"speckit_version": "1.3.2"}' > .specify/init-options.json
+          SYNC_PIN="$(tr -d '[:space:]' < test/spec-kit/sync-target-version.txt)"
+          # Pin must stay older than PyPI latest so postCreate reinstalls specify-cli (see src/spec-kit/README.md).
+          echo "{\"speckit_version\": \"${SYNC_PIN}\"}" > .specify/init-options.json
           cat > .devcontainer/devcontainer.json << EOF
           {
             "name": "Test Spec Kit Feature",

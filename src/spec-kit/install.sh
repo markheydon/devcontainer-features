@@ -217,9 +217,36 @@ json_python_cmd() {
     return 1
 }
 
+python3_is_healthy() {
+    command -v python3 >/dev/null 2>&1 \
+        && python3 -c 'import json, shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+}
+
+managed_python_requested() {
+    case "${MANAGEDPYTHON}" in
+        always) return 0 ;;
+        never) return 1 ;;
+        auto)
+            if python3_is_healthy; then
+                return 1
+            fi
+            return 0
+            ;;
+        *)
+            echo "sync-specify-version: invalid managedPython value: ${MANAGEDPYTHON} (use auto, always, or never)." >&2
+            return 1
+            ;;
+    esac
+}
+
 sync_tool_python_args() {
-    if command -v uv >/dev/null 2>&1; then
+    if managed_python_requested; then
         printf '%s\n' --python "${PYTHONVERSION}"
+        return 0
+    fi
+    if ! python3_is_healthy; then
+        echo "sync-specify-version: system python3 is not usable; install managed Python first." >&2
+        return 1
     fi
 }
 
@@ -239,7 +266,9 @@ run_privileged() {
 restore_shared_uv_permissions() {
     local uv_prefix="/opt/uv"
     run_privileged mkdir -p "${UV_TOOL_DIR}" "${UV_PYTHON_INSTALL_DIR}" "${UV_CACHE_DIR}"
-    run_privileged chmod -R a+rwX "${uv_prefix}" || true
+    if ! run_privileged chmod -R a+rwX "${uv_prefix}"; then
+        echo "Warning: could not restore shared permissions on ${uv_prefix}." >&2
+    fi
 }
 
 read_repo_speckit_version() {

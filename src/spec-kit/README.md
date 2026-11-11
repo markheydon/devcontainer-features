@@ -103,9 +103,14 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 
 **Migrating from a custom install script:** replace repo `speckit_version` in `init-options.json` with `specifyVersion` in `devcontainer.json`, or keep `latest`.
 
+## Base image expectations
+
+- **Debian-family** images with `apt` (CI uses `mcr.microsoft.com/devcontainers/base:ubuntu`).
+- **Non-root create:** `postCreateCommand` runs version sync as the container user. Reinstalling `specify-cli` under `/opt/uv` uses **passwordless `sudo`** when the user is not root. Official Microsoft dev container images (and `common-utils`) typically provide this; plain minimal images may need `common-utils` or equivalent sudo configuration.
+- **`installsAfter` `common-utils`:** metadata only orders features when both are present; on plain bases, add `ghcr.io/devcontainers/features/common-utils` explicitly (see consumer examples above).
+
 ## Caveats
 
-- Intended for Debian-family images with `apt` (CI uses `mcr.microsoft.com/devcontainers/base:ubuntu`).
 - `specifyVersion: latest` takes the current PyPI release at image build; when `.specify/init-options.json` exists, container create may reinstall `speckit_version` from that file. Pin semver for fully reproducible images.
 - Do **not** combine with `ghcr.io/devcontainers-extra/features/uv`; this feature already installs uv.
 - Air-gapped environments: pin `specifyVersion` and `uvVersion` so create-time sync is skipped, or follow [Spec Kit air-gapped guidance](https://github.github.io/spec-kit/install/air-gapped.html). Default `latest` with an existing `.specify/init-options.json` still fetches from PyPI on first create unless you pin.
@@ -115,7 +120,9 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 
 ## Testing
 
-CI runs `test/spec-kit/test.sh`, which simulates `postCreate` by running `sync-specify-version.sh` as the container user against a fixture `speckit_version` (`SPEC_KIT_SYNC_TARGET_VERSION`, default `1.3.2`). Post-publish smoke adds `.specify/init-options.json` and uses `SPEC_KIT_SYNC_VERIFY_ONLY=1` after `devcontainer up`. Bump the default pin when that PyPI release is no longer on PyPI.
+CI runs `test/spec-kit/test.sh`, which simulates `postCreate` by running `sync-specify-version.sh` as the container user against a fixture `speckit_version`. The pin lives in `test/spec-kit/sync-target-version.txt` (override with `SPEC_KIT_SYNC_TARGET_VERSION`). Post-publish smoke reads the same file into `.specify/init-options.json` and uses `SPEC_KIT_SYNC_VERIFY_ONLY=1` after `devcontainer up`.
+
+**If sync tests fail** because PyPI `latest` equals the pin or the pin is unavailable: choose an older published `speckit_version` that is still on PyPI and update `test/spec-kit/sync-target-version.txt` (and ensure it stays below `latest` so a downgrade sync is exercised).
 
 ## Development in this repository
 

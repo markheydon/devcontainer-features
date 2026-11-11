@@ -2,8 +2,26 @@
 set -euo pipefail
 
 python_version="${PYTHONVERSION:-3.12}"
-sync_target_version="${SPEC_KIT_SYNC_TARGET_VERSION:-1.3.2}"
 sync_script="/usr/local/share/spec-kit/sync-specify-version.sh"
+
+resolve_sync_target_version() {
+  if [[ -n "${SPEC_KIT_SYNC_TARGET_VERSION:-}" ]]; then
+    printf '%s' "${SPEC_KIT_SYNC_TARGET_VERSION}"
+    return 0
+  fi
+  local pin_file="${REPO_SYNC_PIN:-}"
+  if [[ -z "${pin_file}" ]]; then
+    pin_file="$(dirname "${BASH_SOURCE[0]}")/sync-target-version.txt"
+  fi
+  if [[ -f "${pin_file}" ]]; then
+    tr -d '[:space:]' < "${pin_file}"
+    return 0
+  fi
+  echo "Set SPEC_KIT_SYNC_TARGET_VERSION or provide test/spec-kit/sync-target-version.txt" >&2
+  return 1
+}
+
+sync_target_version="$(resolve_sync_target_version)"
 
 check() {
   local label="$1"
@@ -71,7 +89,7 @@ simulate_postcreate_sync() {
   fi
   if [[ "${before}" == "${sync_target_version}" ]]; then
     echo "Image already has specify-cli ${sync_target_version}; cannot test downgrade sync." >&2
-    echo "Set SPEC_KIT_SYNC_TARGET_VERSION to an older PyPI release or rebuild with specifyVersion: latest." >&2
+    echo "Update test/spec-kit/sync-target-version.txt to an older PyPI release or rebuild with specifyVersion: latest." >&2
     return 1
   fi
   user="$(dev_container_user)" || {
