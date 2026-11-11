@@ -16,12 +16,12 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
 
 ## Consumer `devcontainer.json`
 
-**Standalone (recommended):**
+**Microsoft dev container base (recommended):** images such as `mcr.microsoft.com/devcontainers/base:ubuntu` already include [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils); do not list it again.
 
 ```json
 {
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {},
     "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.1": {
       "specifyVersion": "latest"
     }
@@ -31,12 +31,26 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
 
 Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need reproducible image builds instead of `latest`.
 
-**With the official Python feature** (VS Code Python tooling + Spec Kit):
+**Plain or minimal base:** when your image does not already provide common-utils, add it so `installsAfter` ordering is explicit:
 
 ```json
 {
+  "image": "ubuntu:24.04",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.1": {
+      "specifyVersion": "latest"
+    }
+  }
+}
+```
+
+**With the official Python feature** (VS Code Python tooling + Spec Kit), on the Microsoft base:
+
+```json
+{
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.12"
     },
@@ -50,7 +64,7 @@ Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need re
 
 With `managedPython: auto`, a 3.11+ `python3` from the Python feature skips a second interpreter install.
 
-Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils).
+Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils runs before this feature when both are in the `features` block. On pre-built Microsoft bases you can omit common-utils; see the root [README.md](../../README.md#using-a-feature).
 
 ## Options
 

@@ -38,7 +38,7 @@ There is no top-level `docs/` folder yet. Use the root README, CONTRIBUTING, and
 - **`version`:** Semver. Bump on any change to install-time behaviour (packages added/removed, scripts, architecture handling).
 - **`name` / `description`:** User-facing; UK English.
 - **`documentationURL`:** Points at this repo tree path for the feature.
-- **`installsAfter`:** Declare ordering when another feature must run first (for example `common-utils`).
+- **`installsAfter`:** Declare ordering when another feature must run first (for example `common-utils`). Keep this in metadata even when many consumers can omit the dependency. In the feature README, state when consumers **must** add the named feature (plain or minimal bases) and when they **may omit** it (pre-built `devcontainers/*` images that already include common-utils). Do not remove `installsAfter` from JSON to “simplify” consumer configs.
 
 ---
 
