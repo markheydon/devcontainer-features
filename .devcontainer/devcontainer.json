@@ -2,6 +2,30 @@
   "name": "Devcontainer Features Dev",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "../src/copilot-likes": {}
+    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/stu-bell/devcontainer-features/cursor-cli:0": {}
+  },
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "json.schemas": [
+          {
+            "fileMatch": [
+              "*/devcontainer-feature.json"
+            ],
+            "url": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainerFeature.schema.json"
+          }
+        ]
+      },
+      "extensions": [
+        "mads-hartmann.bash-ide-vscode"
+      ]
+    }
   }
 }
