@@ -54,14 +54,17 @@ jobs:
 
       - name: Create test devcontainer.json
         run: |
-          mkdir -p .devcontainer
+          mkdir -p .devcontainer .specify
+          # Older than typical PyPI latest — postCreate must reinstall specify-cli (see test/spec-kit/test.sh).
+          echo '{"speckit_version": "1.3.2"}' > .specify/init-options.json
           cat > .devcontainer/devcontainer.json << EOF
           {
             "name": "Test Spec Kit Feature",
             "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
             "features": {
               "ghcr.io/${{ github.repository_owner }}/devcontainer-features/spec-kit:latest": {
-                "pythonVersion": "3.12"
+                "pythonVersion": "3.12",
+                "specifyVersion": "latest"
               }
             }
           }
@@ -75,4 +78,4 @@ jobs:
 
       - name: Run container and verify installation
         run: |
-          devcontainer exec --workspace-folder . bash test/spec-kit/test.sh
+          devcontainer exec --workspace-folder . env SPEC_KIT_SYNC_VERIFY_ONLY=1 bash test/spec-kit/test.sh

@@ -110,7 +110,12 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 - Do **not** combine with `ghcr.io/devcontainers-extra/features/uv`; this feature already installs uv.
 - Air-gapped environments: pin `specifyVersion` and `uvVersion` so create-time sync is skipped, or follow [Spec Kit air-gapped guidance](https://github.github.io/spec-kit/install/air-gapped.html). Default `latest` with an existing `.specify/init-options.json` still fetches from PyPI on first create unless you pin.
 - `/opt/uv` is world-writable (`chmod a+rwX`) so a single dev user can share uv caches and tools; avoid combining with unrelated Unix accounts in one container if you need strict filesystem isolation.
+- Create-time version sync reinstalls `specify-cli` under `/opt/uv` using `sudo` when the dev container runs `postCreateCommand` as a non-root user (typical on Microsoft bases and Aspire images).
 - Supported uv tarball architectures: `x86_64`, `aarch64`, `armv7l`. On `armv7l`, `specify-cli` still installs from PyPI wheels and may fail if no wheel exists for that platform.
+
+## Testing
+
+CI runs `test/spec-kit/test.sh`, which simulates `postCreate` by running `sync-specify-version.sh` as the container user against a fixture `speckit_version` (`SPEC_KIT_SYNC_TARGET_VERSION`, default `1.3.2`). Post-publish smoke adds `.specify/init-options.json` and uses `SPEC_KIT_SYNC_VERIFY_ONLY=1` after `devcontainer up`. Bump the default pin when that PyPI release is no longer on PyPI.
 
 ## Development in this repository
 
