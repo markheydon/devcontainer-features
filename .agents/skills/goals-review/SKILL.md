@@ -67,10 +67,11 @@ Checklist per feature:
 - [ ] New packages/tools belong in feature scope per GOALS.md (not duplicate official devcontainers features)
 - [ ] No scope creep into full language stacks or dotfiles
 
-### G4 — Representative smoke test
+### G4 — Representative CI testing
 
-- [ ] [test.yml](../../.github/workflows/test.yml) references published feature URI and asserts tools the feature installs
-- [ ] When install behaviour adds binaries, smoke test includes `which` checks (or gap flagged)
+- [ ] [feature-test.yml](../../.github/workflows/feature-test.yml) exercises changed features on official base images via `./scripts/test-features.sh`
+- [ ] Assertions live in `test/<feature-id>/test.sh`; [test.yml](../../.github/workflows/test.yml) reuses those scripts against published feature URIs
+- [ ] When install behaviour adds binaries, `test/<feature-id>/test.sh` and the feature-test matrix cover them (or gap flagged)
 
 ### Scope boundaries (from GOALS.md)
 

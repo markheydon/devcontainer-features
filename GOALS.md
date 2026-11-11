@@ -17,13 +17,13 @@ Developers need small, opinionated Dev Container features that complement offici
 - **G1:** Every feature validates with `devcontainers/action` and publishes predictably to `ghcr.io/markheydon/devcontainer-features/<feature-id>`.
 - **G2:** Every `install.sh` is idempotent and fails fast (`set -e`, clear errors).
 - **G3:** Dependencies stay minimal and justified — extend or compose [devcontainers/features](https://github.com/devcontainers/features) rather than reimplementing them.
-- **G4:** The post-publish smoke test in CI stays representative of how consumers reference features in `devcontainer.json`.
+- **G4:** CI testing stays representative: pre-publish installs from `src/` on official Microsoft base images, and the post-publish smoke test references published feature URIs the way consumers do in `devcontainer.json`.
 
 ---
 
 ## Success Looks Like
 
-- New features follow the `src/<id>/` layout and pass validate, ShellCheck, publish, and smoke test.
+- New features follow the `src/<id>/` layout and pass validate, ShellCheck, feature tests ([feature-test.yml](.github/workflows/feature-test.yml)), publish, and post-publish smoke test.
 - Root README and per-feature READMEs list what is installed, consumer references (including `installsAfter`), and caveats.
 - Consumers can pin versions or use `latest` without surprise breaking changes undocumented in release notes or version bumps.
 
@@ -41,7 +41,7 @@ Developers need small, opinionated Dev Container features that complement offici
 ### In scope
 
 - Custom Dev Container features under `src/`.
-- Validate, lint, publish, and smoke-test automation in `.github/workflows/`.
+- Validate, lint, pre-publish feature tests on official base images, publish, and post-publish smoke-test automation in `.github/workflows/`.
 - Documentation for contributors and feature consumers (README, CONTRIBUTING, per-feature README).
 
 ### Out of scope

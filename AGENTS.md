@@ -20,7 +20,7 @@ UK English in documentation, comments, and user-facing text.
 
 - Bash install scripts (`install.sh`) per [Dev Container Features](https://containers.dev/implementors/features/).
 - Feature metadata in `devcontainer-feature.json` under `src/<feature-id>/`.
-- CI: `devcontainers/action` (validate and publish), ShellCheck, post-publish smoke test via `@devcontainers/cli`.
+- CI: `devcontainers/action` (validate and publish), ShellCheck, pre-publish feature tests via [scripts/test-features.sh](scripts/test-features.sh) ([feature-test.yml](.github/workflows/feature-test.yml)), post-publish smoke test via `@devcontainers/cli`.
 
 ## Skills
 
