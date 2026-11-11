@@ -27,7 +27,7 @@ rm -rf /var/lib/apt/lists/*
 
 python3_is_healthy() {
     command -v python3 >/dev/null 2>&1 \
-        && python3 -c 'import shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+        && python3 -c 'import json, shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
 }
 
 managed_python_requested() {
@@ -205,12 +205,13 @@ EOF
 
     tee -a "${SYNC_SPECIFY_VERSION_SCRIPT}" > /dev/null <<'EOF'
 json_python_cmd() {
-    if command -v python3 >/dev/null 2>&1; then
-        printf '%s' 'python3'
-        return 0
-    fi
     if command -v uv >/dev/null 2>&1; then
         printf '%s' "uv run --python ${PYTHONVERSION} python"
+        return 0
+    fi
+    if command -v python3 >/dev/null 2>&1 \
+        && python3 -c 'import json, pathlib, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
+        printf '%s' 'python3'
         return 0
     fi
     return 1
@@ -218,7 +219,7 @@ json_python_cmd() {
 
 python3_is_healthy() {
     command -v python3 >/dev/null 2>&1 \
-        && python3 -c 'import shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+        && python3 -c 'import json, shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
 }
 
 sync_tool_python_args() {
@@ -251,7 +252,8 @@ except (json.JSONDecodeError, OSError):
 if isinstance(data, dict):
     version = data.get("speckit_version")
     if version:
-        print(str(version))'
+        print(str(version))' \
+        || return 0
 }
 
 installed_specify_version() {
