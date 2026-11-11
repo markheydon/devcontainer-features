@@ -70,7 +70,7 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `specifyVersion` | `latest` | PyPI version of `specify-cli`, or `latest` to upgrade on each image build (`uv tool install --force`). |
+| `specifyVersion` | `latest` | PyPI version of `specify-cli`, or `latest` to take the current PyPI release at image build and then match `speckit_version` from `.specify/init-options.json` on container create when present. |
 | `uvVersion` | `0.13.7` | uv GitHub release tag (no leading `v`). |
 | `managedPython` | `auto` | `auto` skips managed Python when `python3` is 3.11+ with a working stdlib; `always` \| `never` — see install script behaviour above. |
 | `pythonVersion` | `3.12` | Version passed to `uv python install` when managed Python runs. |
@@ -91,7 +91,7 @@ When managed Python runs and the Dev Containers lifecycle provides `_REMOTE_USER
 
 ## After the container builds
 
-This feature does **not** run `specify init` or read `.specify/init-options.json`. Initialise or upgrade projects yourself, for example:
+This feature does **not** run `specify init`. With `specifyVersion: latest` (the default), a `postCreateCommand` installs `speckit_version` from `.specify/init-options.json` when that file is present so the container CLI matches the Spec Kit version already in the repo. Initialise or upgrade projects yourself, for example:
 
 ```bash
 specify init my-project --integration copilot
