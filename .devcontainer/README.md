@@ -4,7 +4,8 @@ Tooling for authoring features in this repo uses **third-party Dev Container fea
 
 | Feature | Purpose |
 |---|---|
-| [copilot-likes](../src/copilot-likes) (this repo) | Day-to-day CLI tools |
+| [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) | Required ordering for **copilot-likes** (`installsAfter`) |
+| [copilot-likes](../src/copilot-likes) (this repo) | Day-to-day CLI tools — see [feature README](../src/copilot-likes/README.md) |
 | [shellcheck](https://github.com/devcontainers-extra/features/tree/main/src/shellcheck) | Lint `install.sh` |
 | [node](https://github.com/devcontainers/features/tree/main/src/node) | Runtime for the Dev Container CLI |
 | [devcontainers-cli](https://github.com/eliises/devcontainer-features/tree/main/src/devcontainers-cli) | `devcontainer` command |

@@ -8,8 +8,9 @@ Pull requests welcome.
 2. Add:
    - `devcontainer-feature.json`
    - `install.sh`
-   - `README.md` (recommended — what is installed and why)
+   - `README.md` (recommended — packages and binaries, `installsAfter`, consumer JSON example, caveats)
 3. Ensure `install.sh` is idempotent and uses `set -e` (see [CONVENTIONS.md](CONVENTIONS.md)).
+4. Add a row to the **Features** table in the root [README.md](README.md).
 
 ## Before you open a PR
 

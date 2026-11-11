@@ -74,7 +74,11 @@ shellcheck src/**/install.sh
 
 - **Validate:** Caught on every PR via `validate.yml`.
 - **ShellCheck:** Caught on every PR via `lint.yml`.
-- **Smoke test:** After publish, `test.yml` builds a minimal devcontainer that references the published feature and checks expected binaries (`which`).
+- **Smoke test:** After publish, `test.yml` builds a minimal devcontainer that references the published feature and checks expected binaries (`which`). The workflow is representative of consumer references (published URI, `latest` tag) but does not assert every binary the feature installs. Keep the table below in sync when you extend install behaviour or add CI checks.
+
+| Feature | Asserted in `test.yml` | Installed but not asserted in CI (document in feature README) |
+|---------|------------------------|------------------------------------------------------------------|
+| `copilot-likes` | `rg`, `fd`, `jq`, `bat`/`batcat`, `eza`, `fzf`, `tree`, `direnv`, `delta` | Profile aliases and `/etc/profile.d` behaviour (not executed in non-login `which` checks) |
 
 When adding tools to a feature, add matching assertions to `test.yml` (or a feature-specific job later if the repo grows).
 
