@@ -72,6 +72,9 @@ jobs:
   test-spec-kit:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    env:
+      # Keep in sync with src/spec-kit/devcontainer-feature.json pythonVersion default
+      SPEC_KIT_PYTHON_VERSION: "3.12"
 
     steps:
       - name: Checkout
@@ -80,13 +83,15 @@ jobs:
       - name: Create test devcontainer.json
         run: |
           mkdir -p .devcontainer
-          cat > .devcontainer/devcontainer.json << 'EOF'
+          cat > .devcontainer/devcontainer.json << EOF
           {
             "name": "Test Spec Kit Feature",
             "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
             "features": {
               "ghcr.io/devcontainers/features/common-utils:2": {},
-              "ghcr.io/${{ github.repository_owner }}/devcontainer-features/spec-kit:latest": {}
+              "ghcr.io/${{ github.repository_owner }}/devcontainer-features/spec-kit:latest": {
+                "pythonVersion": "${SPEC_KIT_PYTHON_VERSION}"
+              }
             }
           }
           EOF
@@ -110,5 +115,5 @@ jobs:
             specify version || exit 1
 
             echo '✅ Checking Python 3.11+ via uv'
-            uv run --python 3.12 python -c 'import sys; assert sys.version_info >= (3, 11)' || exit 1
+            uv run --python ${SPEC_KIT_PYTHON_VERSION} python -c 'import sys; assert sys.version_info >= (3, 11)' || exit 1
           "

@@ -25,7 +25,8 @@ python3_meets_minimum() {
 
 install_uv() {
     if command -v uv >/dev/null 2>&1; then
-        if uv --version 2>/dev/null | grep -qF "${UVVERSION}"; then
+        installed_uv_version="$(uv --version 2>/dev/null | awk 'NR==1 { print $2 }')"
+        if [[ "${installed_uv_version}" == "${UVVERSION}" ]]; then
             echo "uv ${UVVERSION} already installed."
             return 0
         fi

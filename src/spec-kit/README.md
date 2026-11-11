@@ -22,12 +22,14 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
 {
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.0": {
+    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.1": {
       "specifyVersion": "latest"
     }
   }
 }
 ```
+
+Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need reproducible image builds instead of `latest`.
 
 **With the official Python feature** (VS Code Python tooling + Spec Kit):
 
@@ -38,7 +40,7 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.12"
     },
-    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.0": {
+    "ghcr.io/markheydon/devcontainer-features/spec-kit:1.0.1": {
       "specifyVersion": "latest",
       "managedPython": "auto"
     }
@@ -79,7 +81,7 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 - `specifyVersion: latest` rebuilds may pick up a newer CLI; pin semver for reproducibility.
 - Do **not** combine with `ghcr.io/devcontainers-extra/features/uv`; this feature already installs uv.
 - Air-gapped environments: pin `specifyVersion` and `uvVersion`, or follow [Spec Kit air-gapped guidance](https://github.github.io/spec-kit/install/air-gapped.html).
-- Supported uv tarball architectures: `x86_64`, `aarch64`, `armv7l`.
+- Supported uv tarball architectures: `x86_64`, `aarch64`, `armv7l`. On `armv7l`, `specify-cli` still installs from PyPI wheels and may fail if no wheel exists for that platform.
 
 ## Development in this repository
 
