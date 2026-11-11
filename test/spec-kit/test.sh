@@ -78,26 +78,34 @@ simulate_postcreate_sync() {
     echo "No vscode or node user in image; cannot simulate postCreate user" >&2
     return 1
   }
-  if ! command -v sudo >/dev/null 2>&1; then
-    echo "sudo is required to run sync as ${user} (postCreate behaviour)" >&2
-    return 1
-  fi
   workspace="$(mktemp -d)"
   # shellcheck disable=SC2064
   trap "rm -rf '${workspace}'" RETURN
-  chown -R "${user}:${user}" "${workspace}"
   mkdir -p "${workspace}/.specify"
   printf '{"speckit_version": "%s"}\n' "${sync_target_version}" >"${workspace}/.specify/init-options.json"
-  chown -R "${user}:${user}" "${workspace}"
-  echo "Running sync-specify-version.sh as ${user}"
-  sudo -u "${user}" -H env \
-    PATH="${PATH}" \
-    UV_TOOL_DIR="${UV_TOOL_DIR:-/opt/uv/tools}" \
-    UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-/usr/local/bin}" \
-    UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-/opt/uv/python}" \
-    UV_PYTHON_BIN_DIR="${UV_PYTHON_BIN_DIR:-/usr/local/bin}" \
-    UV_CACHE_DIR="${UV_CACHE_DIR:-/opt/uv/cache}" \
-    bash -c "cd '${workspace}' && '${sync_script}'"
+
+  if [[ "$(id -un)" == "${user}" ]]; then
+    echo "Running sync-specify-version.sh as ${user} (current user)"
+    (cd "${workspace}" && "${sync_script}")
+  elif [[ "$(id -u)" -eq 0 ]]; then
+    if ! command -v sudo >/dev/null 2>&1; then
+      echo "sudo is required to run sync as ${user} from root" >&2
+      return 1
+    fi
+    chown -R "${user}:${user}" "${workspace}"
+    echo "Running sync-specify-version.sh as ${user} via sudo"
+    sudo -u "${user}" -H env \
+      PATH="${PATH}" \
+      UV_TOOL_DIR="${UV_TOOL_DIR:-/opt/uv/tools}" \
+      UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR:-/usr/local/bin}" \
+      UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR:-/opt/uv/python}" \
+      UV_PYTHON_BIN_DIR="${UV_PYTHON_BIN_DIR:-/usr/local/bin}" \
+      UV_CACHE_DIR="${UV_CACHE_DIR:-/opt/uv/cache}" \
+      bash -c "cd '${workspace}' && '${sync_script}'"
+  else
+    echo "Cannot simulate postCreate: running as $(id -un), expected root or ${user}" >&2
+    return 1
+  fi
   local after
   after="$(installed_specify_version || true)"
   if [[ "${after}" != "${sync_target_version}" ]]; then
