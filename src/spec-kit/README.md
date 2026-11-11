@@ -70,7 +70,7 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `specifyVersion` | `latest` | PyPI version of `specify-cli`, or `latest` to upgrade on each image build (`uv tool install --force`). |
+| `specifyVersion` | `latest` | PyPI version of `specify-cli`, or `latest` to take the current PyPI release at image build and then match `speckit_version` from `.specify/init-options.json` on container create when present. |
 | `uvVersion` | `0.13.7` | uv GitHub release tag (no leading `v`). |
 | `managedPython` | `auto` | `auto` skips managed Python when `python3` is 3.11+ with a working stdlib; `always` \| `never` — see install script behaviour above. |
 | `pythonVersion` | `3.12` | Version passed to `uv python install` when managed Python runs. |
@@ -91,7 +91,7 @@ When managed Python runs and the Dev Containers lifecycle provides `_REMOTE_USER
 
 ## After the container builds
 
-This feature does **not** run `specify init` or read `.specify/init-options.json`. Initialise or upgrade projects yourself, for example:
+This feature does **not** run `specify init`. With `specifyVersion: latest` (the default), a `postCreateCommand` installs `speckit_version` from `.specify/init-options.json` when that file is present so the container CLI matches the Spec Kit version already in the repo. Initialise or upgrade projects yourself, for example:
 
 ```bash
 specify init my-project --integration copilot
@@ -106,9 +106,9 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 ## Caveats
 
 - Intended for Debian-family images with `apt` (CI uses `mcr.microsoft.com/devcontainers/base:ubuntu`).
-- `specifyVersion: latest` rebuilds may pick up a newer CLI; pin semver for reproducibility.
+- `specifyVersion: latest` takes the current PyPI release at image build; when `.specify/init-options.json` exists, container create may reinstall `speckit_version` from that file. Pin semver for fully reproducible images.
 - Do **not** combine with `ghcr.io/devcontainers-extra/features/uv`; this feature already installs uv.
-- Air-gapped environments: pin `specifyVersion` and `uvVersion`, or follow [Spec Kit air-gapped guidance](https://github.github.io/spec-kit/install/air-gapped.html).
+- Air-gapped environments: pin `specifyVersion` and `uvVersion` so create-time sync is skipped, or follow [Spec Kit air-gapped guidance](https://github.github.io/spec-kit/install/air-gapped.html). Default `latest` with an existing `.specify/init-options.json` still fetches from PyPI on first create unless you pin.
 - `/opt/uv` is world-writable (`chmod a+rwX`) so a single dev user can share uv caches and tools; avoid combining with unrelated Unix accounts in one container if you need strict filesystem isolation.
 - Supported uv tarball architectures: `x86_64`, `aarch64`, `armv7l`. On `armv7l`, `specify-cli` still installs from PyPI wheels and may fail if no wheel exists for that platform.
 

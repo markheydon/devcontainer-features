@@ -17,6 +17,7 @@ check_specify_not_under_root() {
 }
 
 check "uv" which uv
+check "sync-specify-version script" test -x /usr/local/share/spec-kit/sync-specify-version.sh
 check "specify" which specify
 check "specify not under /root" check_specify_not_under_root
 check "specify version" specify version

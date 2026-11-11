@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SPEC_KIT_SHARE="/usr/local/share/spec-kit"
+SYNC_SPECIFY_VERSION_SCRIPT="${SPEC_KIT_SHARE}/sync-specify-version.sh"
+
 echo "📦 Installing Spec Kit (uv, Python when needed, specify-cli)..."
 
 export DEBIAN_FRONTEND=noninteractive
@@ -161,24 +164,132 @@ fix_shared_uv_permissions() {
     chmod -R a+rwX "${UV_PREFIX}"
 }
 
-install_specify() {
+install_specify_cli() {
+    local version="$1"
     mkdir -p "${UV_TOOL_DIR}"
     local package="specify-cli"
     local -a python_args=()
     mapfile -t python_args < <(tool_install_python_args)
 
-    if [[ "${SPECIFYVERSION}" == "latest" ]]; then
+    if [[ "${version}" == "latest" ]]; then
         echo "Installing specify-cli (latest from PyPI)..."
         uv tool install --force "${python_args[@]}" "${package}"
-    else
-        echo "Installing specify-cli==${SPECIFYVERSION}..."
-        uv tool install --force "${python_args[@]}" "${package}==${SPECIFYVERSION}"
+        return 0
     fi
+
+    echo "Installing specify-cli==${version}..."
+    uv tool install --force "${python_args[@]}" "${package}==${version}"
+}
+
+install_specify() {
+    install_specify_cli "${SPECIFYVERSION}"
+}
+
+write_sync_specify_version_script() {
+    mkdir -p "${SPEC_KIT_SHARE}"
+
+    tee "${SYNC_SPECIFY_VERSION_SCRIPT}" > /dev/null <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+SPECIFYVERSION="${SPECIFYVERSION}"
+PYTHONVERSION="${PYTHONVERSION}"
+MANAGEDPYTHON="${MANAGEDPYTHON}"
+
+export UV_TOOL_DIR="${UV_TOOL_DIR}"
+export UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR}"
+export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR}"
+export UV_PYTHON_BIN_DIR="${UV_PYTHON_BIN_DIR}"
+export UV_CACHE_DIR="${UV_CACHE_DIR}"
+EOF
+
+    tee -a "${SYNC_SPECIFY_VERSION_SCRIPT}" > /dev/null <<'EOF'
+json_python_cmd() {
+    if command -v python3 >/dev/null 2>&1; then
+        printf '%s' 'python3'
+        return 0
+    fi
+    if command -v uv >/dev/null 2>&1; then
+        printf '%s' "uv run --python ${PYTHONVERSION} python"
+        return 0
+    fi
+    return 1
+}
+
+python3_is_healthy() {
+    command -v python3 >/dev/null 2>&1 \
+        && python3 -c 'import shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+}
+
+sync_tool_python_args() {
+    case "${MANAGEDPYTHON}" in
+        always)
+            printf '%s\n' --python "${PYTHONVERSION}"
+            ;;
+        never)
+            ;;
+        auto)
+            if ! python3_is_healthy; then
+                printf '%s\n' --python "${PYTHONVERSION}"
+            fi
+            ;;
+    esac
+}
+
+read_repo_speckit_version() {
+    local py_cmd
+    py_cmd="$(json_python_cmd)" || return 0
+    # shellcheck disable=SC2086
+    ${py_cmd} -c 'import json, pathlib, sys
+path = pathlib.Path(".specify/init-options.json")
+if not path.is_file():
+    sys.exit(0)
+try:
+    data = json.loads(path.read_text(encoding="utf-8"))
+except (json.JSONDecodeError, OSError):
+    sys.exit(0)
+if isinstance(data, dict):
+    version = data.get("speckit_version")
+    if version:
+        print(str(version))'
+}
+
+installed_specify_version() {
+    if ! command -v uv >/dev/null 2>&1; then
+        return 0
+    fi
+    uv tool list 2>/dev/null | awk '/^specify-cli / { sub(/^v/, "", $2); print $2; exit }'
+}
+
+if [[ "${SPECIFYVERSION}" != "latest" ]]; then
+    exit 0
+fi
+
+repo_version="$(read_repo_speckit_version || true)"
+current_version="$(installed_specify_version || true)"
+
+if [[ -z "${repo_version}" ]]; then
+    exit 0
+fi
+
+if [[ "${current_version}" == "${repo_version}" ]]; then
+    exit 0
+fi
+
+echo "Syncing specify-cli to repo version ${repo_version} (image build had ${current_version:-unknown})..."
+python_args=()
+mapfile -t python_args < <(sync_tool_python_args)
+
+uv tool install --force "${python_args[@]}" "specify-cli==${repo_version}"
+EOF
+
+    chmod 755 "${SYNC_SPECIFY_VERSION_SCRIPT}"
 }
 
 install_uv
 ensure_python
 fix_shared_uv_permissions
+write_sync_specify_version_script
 install_specify
 
 specify version
