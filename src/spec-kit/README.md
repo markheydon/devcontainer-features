@@ -9,8 +9,8 @@ Unlike `ghcr.io/devcontainers/features/python`, this feature installs **no** VS 
 | Component | How |
 |-----------|-----|
 | **uv** | Pinned release tarball from [astral-sh/uv](https://github.com/astral-sh/uv) → `/usr/local/bin` |
-| **Python 3.11+** | When `managedPython` is `auto` or `always` and `python3` on `PATH` is older than 3.11 (or missing), via `uv python install` |
-| **specify** | PyPI package `specify-cli` via `uv tool install` → `/usr/local/bin` |
+| **Python 3.11+** | When `managedPython` is `auto` or `always` and `python3` on `PATH` is missing, older than 3.11, or lacks a working stdlib, via `uv python install` into `/opt/uv/python` (executables linked under `/usr/local/bin`) |
+| **specify** | PyPI package `specify-cli` via `uv tool install`; tool environment under `/opt/uv/tools`, executable in `/usr/local/bin` (usable by the container user, not only `root`) |
 
 `apt`: `ca-certificates`, `curl` (for downloads).
 
@@ -62,7 +62,7 @@ Pin `specifyVersion` to a PyPI release (for example `"0.0.47"`) when you need re
 }
 ```
 
-With `managedPython: auto`, a 3.11+ `python3` from the Python feature skips a second interpreter install.
+With `managedPython: auto`, a 3.11+ `python3` with a working stdlib from the Python feature skips a second interpreter install.
 
 Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) so common-utils runs before this feature when both are in the `features` block. The Dev Containers CLI treats that as a **soft dependency**: if common-utils is not listed, install order still resolves and this feature installs on its own. On pre-built Microsoft bases you can omit common-utils; see the root [README.md](../../README.md#using-a-feature).
 
@@ -72,8 +72,22 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 |--------|---------|-------------|
 | `specifyVersion` | `latest` | PyPI version of `specify-cli`, or `latest` to upgrade on each image build (`uv tool install --force`). |
 | `uvVersion` | `0.13.7` | uv GitHub release tag (no leading `v`). |
-| `managedPython` | `auto` | `auto` \| `always` \| `never` — see install script behaviour above. |
+| `managedPython` | `auto` | `auto` skips managed Python when `python3` is 3.11+ with a working stdlib; `always` \| `never` — see install script behaviour above. |
 | `pythonVersion` | `3.12` | Version passed to `uv python install` when managed Python runs. |
+
+## Container environment
+
+Feature metadata sets these variables so uv keeps tools, interpreters, and caches under `/opt/uv` while exposing binaries on `PATH` via `/usr/local/bin`:
+
+| Variable | Value |
+|----------|-------|
+| `UV_TOOL_DIR` | `/opt/uv/tools` |
+| `UV_TOOL_BIN_DIR` | `/usr/local/bin` |
+| `UV_PYTHON_INSTALL_DIR` | `/opt/uv/python` |
+| `UV_PYTHON_BIN_DIR` | `/usr/local/bin` |
+| `UV_CACHE_DIR` | `/opt/uv/cache` |
+
+When managed Python runs and the Dev Containers lifecycle provides `_REMOTE_USER_HOME`, the install script writes `${_REMOTE_USER_HOME}/.config/uv/.python-version` so the container user’s uv commands prefer the pinned interpreter.
 
 ## After the container builds
 
@@ -95,6 +109,7 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 - `specifyVersion: latest` rebuilds may pick up a newer CLI; pin semver for reproducibility.
 - Do **not** combine with `ghcr.io/devcontainers-extra/features/uv`; this feature already installs uv.
 - Air-gapped environments: pin `specifyVersion` and `uvVersion`, or follow [Spec Kit air-gapped guidance](https://github.github.io/spec-kit/install/air-gapped.html).
+- `/opt/uv` is world-writable (`chmod a+rwX`) so a single dev user can share uv caches and tools; avoid combining with unrelated Unix accounts in one container if you need strict filesystem isolation.
 - Supported uv tarball architectures: `x86_64`, `aarch64`, `armv7l`. On `armv7l`, `specify-cli` still installs from PyPI wheels and may fail if no wheel exists for that platform.
 
 ## Development in this repository

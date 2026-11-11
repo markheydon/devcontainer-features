@@ -10,8 +10,15 @@ check() {
   "$@"
 }
 
+check_specify_not_under_root() {
+  local target
+  target="$(readlink -f "$(command -v specify)")"
+  case "${target}" in /root/*) return 1 ;; esac
+}
+
 check "uv" which uv
 check "specify" which specify
+check "specify not under /root" check_specify_not_under_root
 check "specify version" specify version
 check "Python ${python_version} via uv" \
   uv run --python "${python_version}" python -c 'import sys; assert sys.version_info >= (3, 11)'

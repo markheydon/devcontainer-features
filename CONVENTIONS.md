@@ -81,7 +81,7 @@ shellcheck src/**/install.sh
 | Feature | Asserted in `test/<feature-id>/test.sh` | Installed but not asserted in CI (document in feature README) |
 |---------|------------------------|------------------------------------------------------------------|
 | `copilot-likes` | `rg`, `fd`, `jq`, `bat`/`batcat`, `eza`, `fzf`, `tree`, `direnv`, `delta` | Profile aliases and `/etc/profile.d` behaviour (not executed in non-login `which` checks) |
-| `spec-kit` | `uv`, `specify`, `specify version`, Python ≥3.11 via `uv run` | `uvx`, uv-managed Python when base `python3` < 3.11 (covered indirectly by `specify`) |
+| `spec-kit` | `uv`, `specify`, `specify version`, `specify` not under `/root`, Python ≥3.11 via `uv run` | `uvx`, `/opt/uv` layout, shared permissions, and `managedPython` branches (see [spec-kit README](src/spec-kit/README.md)) |
 
 When adding tools to a feature, add matching assertions to `test/<feature-id>/test.sh` and keep the post-publish smoke jobs in [test.yml](.github/workflows/test.yml) in sync (or a feature-specific job later if the repo grows).
 
