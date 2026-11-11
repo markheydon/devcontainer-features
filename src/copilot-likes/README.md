@@ -29,7 +29,7 @@ Opinionated Dev Container feature with CLI tools and small UX defaults that GitH
 
 ## Consumer `devcontainer.json`
 
-Published reference (pin semver or use a major-version tag after publish).
+Published reference: use the major tag `:1` unless you need a pinned semver (see the root [README](../../README.md#using-a-feature)).
 
 **Microsoft dev container base (recommended):** the base this repo uses in its [maintainer dev container](../../.devcontainer/README.md) already includes [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils).
 
@@ -37,7 +37,7 @@ Published reference (pin semver or use a major-version tag after publish).
 {
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.2": {}
+    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {}
   }
 }
 ```
@@ -49,7 +49,7 @@ Published reference (pin semver or use a major-version tag after publish).
   "image": "ubuntu:24.04",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1.0.2": {}
+    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {}
   }
 }
 ```
