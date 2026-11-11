@@ -26,6 +26,7 @@ CI workflows live under `.github/workflows/`:
 | `validate.yml` | `devcontainers/action` validate-only on PR and `main` |
 | `lint.yml` | ShellCheck on install scripts |
 | `publish.yml` | Publish features to GHCR on push to `main` |
+| `feature-test.yml` | On PR and `main`, `./scripts/test-features.sh` per feature × base image (matrix; subset of [scripts/official-base-images.txt](scripts/official-base-images.txt)) |
 | `test.yml` | After successful publish, `devcontainer up` and verify tools |
 
 There is no top-level `docs/` folder yet. Use the root README, CONTRIBUTING, and per-feature READMEs. Publish may generate OCI feature documentation when `generate-docs` is enabled.
@@ -74,27 +75,38 @@ shellcheck src/**/install.sh
 
 - **Validate:** Caught on every PR via `validate.yml`.
 - **ShellCheck:** Caught on every PR via `lint.yml`.
-- **Smoke test:** After publish, `test.yml` builds a minimal devcontainer that references the published feature and checks expected binaries (`which`). The workflow is representative of consumer references (published URI, `latest` tag) but does not assert every binary the feature installs. Keep the table below in sync when you extend install behaviour or add CI checks.
+- **Feature tests (PR / `main`):** [feature-test.yml](.github/workflows/feature-test.yml) runs `./scripts/test-features.sh <feature-id> <base-image>` for each matrix combination. The workflow matrix defines which images CI uses; [scripts/official-base-images.txt](scripts/official-base-images.txt) is the default list for a full local matrix via `./scripts/test-features.sh` with no arguments. Assertions live in `test/<feature-id>/test.sh`.
+- **Smoke test:** After publish, `test.yml` builds a minimal devcontainer that references the published feature and runs the same `test.sh` scripts. The workflow is representative of consumer references (published URI, `latest` tag). Keep the table below in sync when you extend install behaviour or add CI checks.
 
-| Feature | Asserted in `test.yml` | Installed but not asserted in CI (document in feature README) |
+| Feature | Asserted in `test/<feature-id>/test.sh` | Installed but not asserted in CI (document in feature README) |
 |---------|------------------------|------------------------------------------------------------------|
 | `copilot-likes` | `rg`, `fd`, `jq`, `bat`/`batcat`, `eza`, `fzf`, `tree`, `direnv`, `delta` | Profile aliases and `/etc/profile.d` behaviour (not executed in non-login `which` checks) |
 | `spec-kit` | `uv`, `specify`, `specify version`, Python ≥3.11 via `uv run` | `uvx`, uv-managed Python when base `python3` < 3.11 (covered indirectly by `specify`) |
 
-When adding tools to a feature, add matching assertions to `test.yml` (or a feature-specific job later if the repo grows).
+When adding tools to a feature, add matching assertions to `test/<feature-id>/test.sh` and keep the post-publish smoke jobs in [test.yml](.github/workflows/test.yml) in sync (or a feature-specific job later if the repo grows).
+
+Official Microsoft base images for install testing are listed in [scripts/official-base-images.txt](scripts/official-base-images.txt) (keep [feature-test.yml](.github/workflows/feature-test.yml) in sync). Probe apt/Yarn/`git-delta` behaviour on those images without installing a feature:
+
+```bash
+./scripts/probe-base-images.sh
+```
 
 Manual checks (with Docker on the host; see `.devcontainer/devcontainer.json`):
 
 ```bash
-# Auto-generated install test for one feature
+# Local matrix (recommended in the maintainer dev container)
+./scripts/test-features.sh
+./scripts/test-features.sh <feature-id> mcr.microsoft.com/devcontainers/php:latest
+
+# Direct CLI (works when the Docker host shares the CLI workspace path)
 devcontainer features test -f <feature-id> \
-  --base-image mcr.microsoft.com/devcontainers/base:ubuntu
+  -i mcr.microsoft.com/devcontainers/base:ubuntu
 
 # End-to-end try-out with a devcontainer.json that references ../src/<feature-id>
 devcontainer up --workspace-folder .
 ```
 
-Feature packaging and metadata validation also run in CI ([validate.yml](.github/workflows/validate.yml)). Optional `test/<feature-id>/test.sh` scripts can be added later for richer `devcontainer features test` coverage ([CLI docs](https://github.com/devcontainers/cli/blob/main/docs/features/test.md)).
+Feature packaging and metadata validation also run in CI ([validate.yml](.github/workflows/validate.yml)). Post-install assertions live in `test/<feature-id>/test.sh` ([CLI docs](https://github.com/devcontainers/cli/blob/main/docs/features/test.md)).
 
 ---
 

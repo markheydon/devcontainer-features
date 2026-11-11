@@ -20,7 +20,7 @@ UK English in documentation, comments, and user-facing text.
 
 - Bash install scripts (`install.sh`) per [Dev Container Features](https://containers.dev/implementors/features/).
 - Feature metadata in `devcontainer-feature.json` under `src/<feature-id>/`.
-- CI: `devcontainers/action` (validate and publish), ShellCheck, post-publish smoke test via `@devcontainers/cli`.
+- CI: `devcontainers/action` (validate and publish), ShellCheck, pre-publish feature tests via [scripts/test-features.sh](scripts/test-features.sh) ([feature-test.yml](.github/workflows/feature-test.yml)), post-publish smoke test via `@devcontainers/cli`.
 
 ## Skills
 
@@ -56,17 +56,17 @@ Before opening a PR (local checks mirror CI where possible):
 
 ```bash
 shellcheck src/**/install.sh
-# Optional when Docker is available (development container includes the CLI):
-# devcontainer features test -f <feature-id> --base-image mcr.microsoft.com/devcontainers/base:ubuntu
+# Optional when Docker is available — full matrix: ./scripts/test-features.sh
+# devcontainer features test -f <feature-id> -i mcr.microsoft.com/devcontainers/base:ubuntu .
 ```
 
-See [.devcontainer/README.md](.devcontainer/README.md) for maintainer tooling (ShellCheck, Dev Container CLI, host Docker).
+See [.devcontainer/README.md](.devcontainer/README.md) for maintainer tooling (ShellCheck, Dev Container CLI, host Docker, [scripts/test-features.sh](scripts/test-features.sh)).
 
-On every PR and push to `main`, GitHub Actions runs ShellCheck ([lint.yml](.github/workflows/lint.yml)) and feature validation ([validate.yml](.github/workflows/validate.yml)). After merge, features publish and the post-publish test workflow runs ([test.yml](.github/workflows/test.yml)).
+On every PR and push to `main`, GitHub Actions runs ShellCheck ([lint.yml](.github/workflows/lint.yml)), feature validation ([validate.yml](.github/workflows/validate.yml)), and [scripts/test-features.sh](scripts/test-features.sh) per job in [feature-test.yml](.github/workflows/feature-test.yml). After merge, features publish and the post-publish smoke test workflow runs ([test.yml](.github/workflows/test.yml)).
 
 When install behaviour changes:
 
 - Bump the feature `version` in `devcontainer-feature.json`.
-- Extend the post-publish test assertions if new binaries or tools should be verified.
+- Extend assertions in `test/<feature-id>/test.sh` and keep post-publish smoke jobs in [test.yml](.github/workflows/test.yml) in sync.
 
 All agent-authored pull requests require human review before merge.

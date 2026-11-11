@@ -12,7 +12,7 @@ Repeat this cycle until the review is clear of actionable findings:
    shellcheck src/**/install.sh
    ```
 
-   Optional: `devcontainer features test -f <feature-id> --base-image mcr.microsoft.com/devcontainers/base:ubuntu` when Docker is available ([.devcontainer/README.md](../../.devcontainer/README.md)). Feature metadata validation runs in CI via [validate.yml](../../.github/workflows/validate.yml). Fix any ShellCheck failures before the next loop.
+   Optional when Docker is available: `./scripts/test-features.sh <feature-id>` (full matrix: `./scripts/test-features.sh`) — see [.devcontainer/README.md](../../.devcontainer/README.md). CI runs [feature-test.yml](../../.github/workflows/feature-test.yml) and [validate.yml](../../.github/workflows/validate.yml). Fix any ShellCheck failures before the next loop.
 
 4. **Commit** — When a loop produced code changes, create a commit with a message that reflects the review fixes (invoking this command counts as explicit permission to commit).
 

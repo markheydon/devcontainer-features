@@ -23,11 +23,28 @@ shellcheck src/**/install.sh
 Optional, when Docker is available on the host (see `docker-outside-of-docker` in [devcontainer.json](.devcontainer/devcontainer.json)):
 
 ```bash
-devcontainer features test -f <feature-id> \
-  --base-image mcr.microsoft.com/devcontainers/base:ubuntu
+# Recommended: full matrix (or one feature / one image)
+./scripts/test-features.sh
+./scripts/test-features.sh <feature-id>
+./scripts/test-features.sh <feature-id> mcr.microsoft.com/devcontainers/php:latest
 ```
 
-Run that once per changed feature (`feature-id` matches the folder under `src/`). This exercises install scripts in a fresh image; CI still runs the authoritative checks below.
+That script installs from `src/` using the Dev Container CLI, then runs `test/<feature-id>/test.sh`. In the maintainer dev container, plain `devcontainer features test` often fails after a successful build because of bind-mount paths; the script still runs the assertions in the built image (see [.devcontainer/README.md](.devcontainer/README.md)).
+
+On a host where `devcontainer features test` completes end-to-end, you can call it directly:
+
+```bash
+devcontainer features test -f <feature-id> \
+  -i mcr.microsoft.com/devcontainers/base:ubuntu
+```
+
+Run tests once per changed feature (`feature-id` matches the folder under `src/`). Image list: [scripts/official-base-images.txt](scripts/official-base-images.txt). To investigate apt/Yarn issues on those bases without installing a feature:
+
+```bash
+./scripts/probe-base-images.sh
+```
+
+CI runs **feature tests** with the same helper as local checks: `./scripts/test-features.sh <feature-id> <base-image>` for each job in the [feature-test.yml](.github/workflows/feature-test.yml) matrix (a fixed subset of the images in [scripts/official-base-images.txt](scripts/official-base-images.txt)). Run the full local matrix with `./scripts/test-features.sh` and no arguments.
 
 CI also runs:
 
@@ -40,7 +57,7 @@ After merge to `main`, features **publish** to GHCR ([publish.yml](.github/workf
 
 Bump the feature **`version`** in `devcontainer-feature.json` whenever install-time behaviour changes (packages, scripts, downloads, or assertions consumers rely on).
 
-If you add tools that should be verified in CI, extend the smoke test in `test.yml` with matching `which` checks.
+If you add tools that should be verified in CI, extend `test/<feature-id>/test.sh` and keep the post-publish smoke test ([test.yml](.github/workflows/test.yml)) in sync.
 
 ## Project intent
 

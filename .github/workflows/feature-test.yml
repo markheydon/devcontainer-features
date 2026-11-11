@@ -1,0 +1,39 @@
+name: Test Features on official images
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-features:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        feature: [copilot-likes, spec-kit]
+        baseImage:
+          # Keep in sync with scripts/official-base-images.txt
+          - mcr.microsoft.com/devcontainers/base:ubuntu
+          - mcr.microsoft.com/devcontainers/php:latest
+          - mcr.microsoft.com/devcontainers/dotnet:latest
+          - mcr.microsoft.com/devcontainers/python:latest
+          - mcr.microsoft.com/devcontainers/javascript-node:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Test ${{ matrix.feature }} on ${{ matrix.baseImage }}
+        run: |
+          ./scripts/test-features.sh \
+            "${{ matrix.feature }}" \
+            "${{ matrix.baseImage }}"

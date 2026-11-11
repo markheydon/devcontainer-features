@@ -39,7 +39,7 @@ If there is no diff, say so in one sentence and stop.
 2. Security concerns: secrets in scripts, unpinned remote downloads, overly broad `apt` installs, unsafe `curl | bash`.
 3. Violations of [CONVENTIONS.md](../../CONVENTIONS.md) and [GOALS.md](../../GOALS.md): missing `set -e`, non-idempotent installs, folder/id mismatch.
 4. Metadata mistakes: `devcontainer-feature.json` `id` not matching folder, forgotten **version bump** when install behaviour changed, wrong `documentationURL` or `installsAfter`.
-5. CI gaps: ShellCheck failures, validate workflow paths, missing smoke-test assertions in [test.yml](../../.github/workflows/test.yml) for new binaries.
+5. CI gaps: ShellCheck failures, validate workflow paths, missing assertions in `test/<feature-id>/test.sh` or [feature-test.yml](../../.github/workflows/feature-test.yml) matrix for new binaries, and drift between post-publish smoke jobs in [test.yml](../../.github/workflows/test.yml) and those scripts.
 6. GHCR consumer contract: feature id or publish namespace changes that break existing `devcontainer.json` references without migration notes.
 7. Documentation drift: README or feature README not updated when behaviour changes.
 

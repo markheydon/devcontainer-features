@@ -77,4 +77,4 @@ Unpublished installs use a repo-relative path:
 }
 ```
 
-See the root [CONTRIBUTING.md](../../CONTRIBUTING.md) for ShellCheck, `devcontainer features test`, and versioning rules.
+See the root [CONTRIBUTING.md](../../CONTRIBUTING.md) for ShellCheck, `./scripts/test-features.sh`, and versioning rules.

@@ -34,7 +34,7 @@ Some features declare `installsAfter` in metadata (for example **copilot-likes**
 
 Pull requests welcome. Workflow, local checks, and versioning: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-Maintainers use the development container in [.devcontainer/](.devcontainer/README.md) (ShellCheck, Dev Container CLI, host Docker for `devcontainer up` / `features test`).
+Maintainers use the development container in [.devcontainer/](.devcontainer/README.md) (ShellCheck, Dev Container CLI, host Docker for [scripts/test-features.sh](scripts/test-features.sh) and `devcontainer up` try-outs).
 
 ## Licence
 
