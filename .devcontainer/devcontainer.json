@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "../src/dev-agent-tools": {},
+    "ghcr.io/markheydon/devcontainer-features/dev-agent-tools:1": {},
     "ghcr.io/devcontainers-extra/features/shellcheck:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/eliises/devcontainer-features/devcontainers-cli:1": {},
