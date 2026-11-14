@@ -53,6 +53,13 @@ CI also runs:
 
 After merge to `main`, features **publish** to GHCR ([publish.yml](.github/workflows/publish.yml)) and a **smoke test** runs ([test.yml](.github/workflows/test.yml)).
 
+Consumer docs under `docs/` deploy to GitHub Pages from `main` ([pages.yml](.github/workflows/pages.yml)). To build locally:
+
+```bash
+pip install -r docs/requirements.txt
+mkdocs build --strict
+```
+
 ## Versioning
 
 Bump the feature **`version`** in `devcontainer-feature.json` whenever install-time behaviour changes (packages, scripts, downloads, or assertions consumers rely on).

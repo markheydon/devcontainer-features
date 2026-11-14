@@ -1,59 +1,48 @@
 ---
 name: project-documentation
-description: Project-aware documentation conventions that complement the documentation-writer skill. Use when writing or updating README content, docs pages, user guides, tutorials, or technical blog posts in a repository that provides project context files such as GOALS.md, CONVENTIONS.md, or AGENTS.md.
+description: Diátaxis-aligned, project-aware documentation for this repository. Use when writing or updating README content, docs/, user guides, tutorials, or technical posts; read GOALS.md and CONVENTIONS.md for placement and conventions.
 ---
 
-# Project Documentation Companion
+# Project documentation
 
-This skill complements the upstream `documentation-writer` skill.
-Use it to add project-aware documentation judgement on top of Diátaxis guidance.
+Expert technical writing for this repository, grounded in the [Diátaxis framework](https://diataxis.fr/) and local project context.
 
-## When to use this skill
+## Guiding principles
 
-Use this skill when you need to:
-- Write or update project documentation that should reflect the repository's goals, scope, and conventions.
-- Decide whether content belongs in `README.md`, `docs/`, or another project-owned Markdown file.
-- Keep documentation concise, grounded in the codebase, and consistent with local terminology.
+1. **Clarity:** Simple, unambiguous language (UK English in this repository).
+2. **Accuracy:** Code snippets, commands, and feature ids must match the codebase and published GHCR ids.
+3. **User-centricity:** Each document helps a specific reader achieve a specific goal.
+4. **Consistency:** Tone and terminology align with GOALS.md, CONVENTIONS.md, and existing docs.
 
-## Layering
+## Document types (Diátaxis)
 
-Treat the writing stack as three layers:
-
-1. `documentation-writer` - Diátaxis framework, audience clarification, and document structure.
-2. This skill - project-aware placement, terminology, and review rules.
-3. The active repository context files - the source of truth for goals, scope, conventions, and local standards.
+| Type | Orientation | Use for |
+|------|-------------|---------|
+| **Tutorial** | Learning | First successful path for newcomers |
+| **How-to** | Problem | Steps to solve one specific task |
+| **Reference** | Information | Exact behaviour, options, installed tools |
+| **Explanation** | Understanding | Concepts, trade-offs, legacy ids, architecture |
 
 ## Workflow
 
-1. Start by applying the `documentation-writer` skill for document type, audience, goal, and scope.
-2. Read any available context files before drafting:
-   - `GOALS.md`
-   - `CONVENTIONS.md`
-   - `AGENTS.md`
-   - `SCOPE.md` when present (some repos keep scope inside GOALS.md)
-3. Ground all terminology and recommendations in those files. Do not invent missing context.
-4. Choose the document location using [references/document-placement.md](references/document-placement.md).
-5. If a template or starter structure would help, use the relevant file in `assets/`.
-6. Before finishing, run through [references/review-checklist.md](references/review-checklist.md).
+1. **Clarify** before drafting (ask if needed):
+   - Document type, target audience, user goal, and scope (included vs excluded topics).
+2. **Read context:** `GOALS.md`, `CONVENTIONS.md`, `AGENTS.md`; relevant `src/<feature-id>/README.md`.
+3. **Propose structure** for substantial docs (outline or TOC); proceed when the task is small and clear.
+4. **Choose placement** using [references/document-placement.md](references/document-placement.md).
+5. **Draft** in Markdown; use [assets/](assets/) templates when helpful.
+6. **Review** with [references/review-checklist.md](references/review-checklist.md).
 
 ## Scope boundaries
 
-- This skill is for project documentation, not ADR authoring.
-- If the user wants to create or update an ADR, use the dedicated `create-architectural-decision-record` skill instead.
-- Do not duplicate ADR templates or ADR process rules here.
-
-## Writing rules
-
-- Keep prose concise and specific.
-- Prefer task-oriented guidance over feature tours.
-- Reflect the repository's actual structure and workflows rather than generic boilerplate.
-- When context files and existing docs disagree, flag the mismatch rather than silently picking one.
+- This skill is for project documentation, not ADR authoring. Use `create-architectural-decision-record` for `adr/`.
+- Do not duplicate ADR process rules here.
 
 ## References
 
-- [references/document-placement.md](references/document-placement.md) - decide where content should live.
-- [references/review-checklist.md](references/review-checklist.md) - final review checks.
-- [assets/readme-section-template.md](assets/readme-section-template.md) - starter for short README sections.
-- [assets/how-to-template.md](assets/how-to-template.md) - starter for task-focused how-to guides.
-- [assets/tutorial-template.md](assets/tutorial-template.md) - starter for learning-oriented tutorials.
-- [assets/technical-blog-template.md](assets/technical-blog-template.md) - starter for technical blog posts.
+- [references/document-placement.md](references/document-placement.md)
+- [references/review-checklist.md](references/review-checklist.md)
+- [assets/readme-section-template.md](assets/readme-section-template.md)
+- [assets/how-to-template.md](assets/how-to-template.md)
+- [assets/tutorial-template.md](assets/tutorial-template.md)
+- [assets/technical-blog-template.md](assets/technical-blog-template.md)

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-echo "📦 Installing Copilot-Likes toolset..."
+echo "📦 Installing Dev Agent Tools..."
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -67,13 +67,18 @@ fi
 # Enable direnv and add useful aliases globally.
 # Writing to a dedicated file (rather than appending) makes this idempotent:
 # re-running the script simply overwrites the file with the same content.
-cat > /etc/profile.d/copilot-likes.sh << 'EOF'
-# Copilot-Likes: direnv hook
+cat > /etc/profile.d/dev-agent-tools.sh << 'EOF'
+# Dev Agent Tools: direnv hook
 if command -v direnv >/dev/null 2>&1; then
     eval "$(direnv hook bash)"
 fi
 
-# Copilot-friendly aliases
+# Simpler prompt when Cursor Agent runs commands (avoids heavy theme truncation)
+if [[ -n "${CURSOR_AGENT:-}" ]]; then
+    PS1='\u@\h \W \$ '
+fi
+
+# Agent-friendly aliases
 alias ll="eza -lah --git"
 alias ls="eza --icons"
 alias cat="bat"
@@ -83,4 +88,4 @@ EOF
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 
-echo "✅ Copilot-Likes installed!"
+echo "✅ Dev Agent Tools installed!"

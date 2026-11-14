@@ -1,0 +1,47 @@
+site_name: Dev Container Features
+site_url: https://markheydon.github.io/devcontainer-features/
+repo_url: https://github.com/markheydon/devcontainer-features
+repo_name: markheydon/devcontainer-features
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - navigation.expand
+    - navigation.sections
+    - search.suggest
+
+nav:
+  - Home: index.md
+  - Guides:
+      - Getting started: guides/getting-started.md
+      - Versioning and tags: guides/versioning.md
+      - Common-utils dependency: guides/common-utils.md
+      - Legacy feature ids: guides/legacy-feature-ids.md
+  - Features:
+      - Dev Agent Tools: features/dev-agent-tools.md
+      - Spec Kit: features/spec-kit.md
+  - Contributing: contributing.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+plugins:
+  - search

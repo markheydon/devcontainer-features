@@ -7,6 +7,6 @@ alwaysApply: false
 # Markdown Documentation
 
 - Use UK English spelling.
-- For general documentation, use `documentation-writer` and `project-documentation` skills in `.agents/skills/`.
+- For general documentation, use the `project-documentation` skill in `.agents/skills/`.
 - Ground content in `GOALS.md` and `CONVENTIONS.md`.
 - For ADRs under `adr/` (if present), use `create-architectural-decision-record` instead of general documentation skills.
