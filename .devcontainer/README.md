@@ -4,7 +4,7 @@ Tooling for authoring features in this repo uses **third-party Dev Container fea
 
 | Feature | Purpose |
 |---|---|
-| [dev-agent-tools](../src/dev-agent-tools) (this repo) | Day-to-day CLI tools — see [feature README](../src/dev-agent-tools/README.md) |
+| [dev-agent-tools](../src/dev-agent-tools) (GHCR `:1` in [devcontainer.json](devcontainer.json)) | Day-to-day CLI tools — see [feature README](../src/dev-agent-tools/README.md) |
 | [shellcheck](https://github.com/devcontainers-extra/features/tree/main/src/shellcheck) | Lint `install.sh` |
 | [node](https://github.com/devcontainers/features/tree/main/src/node) | Runtime for the Dev Container CLI |
 | [devcontainers-cli](https://github.com/eliises/devcontainer-features/tree/main/src/devcontainers-cli) | `devcontainer` command |
