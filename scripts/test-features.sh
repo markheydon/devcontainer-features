@@ -21,8 +21,8 @@ scripts/official-base-images.txt (or one base image) and run test/<feature-id>/t
 
 Examples:
   $(basename "$0")
-  $(basename "$0") copilot-likes
-  $(basename "$0") copilot-likes mcr.microsoft.com/devcontainers/php:latest
+  $(basename "$0") dev-agent-tools
+  $(basename "$0") dev-agent-tools mcr.microsoft.com/devcontainers/php:latest
 EOF
 }
 

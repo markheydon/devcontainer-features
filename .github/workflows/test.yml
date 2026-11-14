@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  test-feature:
+  test-dev-agent-tools:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
@@ -26,6 +26,37 @@ jobs:
             "name": "Test Feature",
             "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
             "features": {
+              "ghcr.io/${{ github.repository_owner }}/devcontainer-features/dev-agent-tools:latest": {}
+            }
+          }
+          EOF
+
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Start dev container
+        run: devcontainer up --workspace-folder .
+
+      - name: Run container and verify installation
+        run: |
+          devcontainer exec --workspace-folder . bash test/dev-agent-tools/test.sh
+
+  test-dev-agent-tools-legacy-id:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Create test devcontainer.json
+        run: |
+          mkdir -p .devcontainer
+          cat > .devcontainer/devcontainer.json << 'EOF'
+          {
+            "name": "Test Legacy Feature Id",
+            "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+            "features": {
               "ghcr.io/${{ github.repository_owner }}/devcontainer-features/copilot-likes:latest": {}
             }
           }
@@ -39,7 +70,7 @@ jobs:
 
       - name: Run container and verify installation
         run: |
-          devcontainer exec --workspace-folder . bash test/copilot-likes/test.sh
+          devcontainer exec --workspace-folder . bash test/dev-agent-tools/test.sh
 
   test-spec-kit:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}

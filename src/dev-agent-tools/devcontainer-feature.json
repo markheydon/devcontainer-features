@@ -1,0 +1,13 @@
+{
+  "id": "dev-agent-tools",
+  "version": "1.1.0",
+  "name": "Dev Agent Tools",
+  "description": "Modern CLI tools and small shell or git defaults that coding agents often assume are installed. Not tied to a specific AI product.",
+  "documentationURL": "https://markheydon.github.io/devcontainer-features/features/dev-agent-tools/",
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ],
+  "legacyIds": [
+    "copilot-likes"
+  ]
+}

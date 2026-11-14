@@ -39,7 +39,7 @@ For each feature id, verify:
 
 | Feature | devcontainer-feature.json | install.sh | README | version | Status |
 |---------|---------------------------|------------|--------|---------|--------|
-| `copilot-likes` | present | present | optional | semver | OK / drift |
+| `dev-agent-tools` | present | present | optional | semver | OK / drift |
 
 Checklist per feature:
 

@@ -31,8 +31,7 @@ Project skills live in `.agents/skills/`.
 | `code-review` | Reviewing install scripts, metadata, or CI-related changes before merge |
 | `goals-review` | Drift check against GOALS.md and feature inventory |
 | `create-architectural-decision-record` | Creating an ADR (only when user asks or policy needs recording) |
-| `documentation-writer` | Diátaxis-aligned documentation |
-| `project-documentation` | Project-aware docs placement |
+| `project-documentation` | Diátaxis-aligned, project-aware docs (README, `docs/`, placement) |
 
 ## Task Routing
 

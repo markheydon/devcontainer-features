@@ -29,7 +29,7 @@ CI workflows live under `.github/workflows/`:
 | `feature-test.yml` | On PR and `main`, `./scripts/test-features.sh` per feature × base image (matrix; subset of [scripts/official-base-images.txt](scripts/official-base-images.txt)) |
 | `test.yml` | After successful publish, `devcontainer up` and verify tools |
 
-There is no top-level `docs/` folder yet. Use the root README, CONTRIBUTING, and per-feature READMEs. Publish may generate OCI feature documentation when `generate-docs` is enabled.
+Consumer-facing documentation lives under `docs/` (MkDocs; [GitHub Pages](https://markheydon.github.io/devcontainer-features/) via [.github/workflows/pages.yml](.github/workflows/pages.yml)). The root README links to the site; per-feature READMEs under `src/` remain install-adjacent references. Publish may still generate OCI feature documentation when `generate-docs` is enabled.
 
 ---
 
@@ -80,7 +80,7 @@ shellcheck src/**/install.sh
 
 | Feature | Asserted in `test/<feature-id>/test.sh` | Installed but not asserted in CI (document in feature README) |
 |---------|------------------------|------------------------------------------------------------------|
-| `copilot-likes` | `rg`, `fd`, `jq`, `bat`/`batcat`, `eza`, `fzf`, `tree`, `direnv`, `delta` | Profile aliases and `/etc/profile.d` behaviour (not executed in non-login `which` checks) |
+| `dev-agent-tools` | `rg`, `fd`, `jq`, `bat`/`batcat`, `eza`, `fzf`, `tree`, `direnv`, `delta` | Profile aliases, `CURSOR_AGENT` prompt, and `/etc/profile.d` behaviour (not executed in non-login `which` checks) |
 | `spec-kit` | `uv`, `specify`, `specify version`, `specify` not under `/root`, Python ≥3.11 via `uv run`, `sync-specify-version.sh` on disk, simulated postCreate sync as non-root; smoke uses `.specify/init-options.json` + `SPEC_KIT_SYNC_VERIFY_ONLY` | `uvx`, `/opt/uv` layout, shared permissions, and remaining `managedPython` branches (see [spec-kit README](src/spec-kit/README.md)) |
 
 When adding tools to a feature, add matching assertions to `test/<feature-id>/test.sh` and keep the post-publish smoke jobs in [test.yml](.github/workflows/test.yml) in sync (or a feature-specific job later if the repo grows).
@@ -118,7 +118,7 @@ Feature packaging and metadata validation also run in CI ([validate.yml](.github
 - Keep the root README feature list in sync with folders under `src/`.
 - Per-feature README: what gets installed, why, and any caveats (architecture, `installsAfter`). Consumer `devcontainer.json` examples use GHCR major tags (`:1`), not patch semver, unless the text is about pinning.
 
-See `.agents/skills/project-documentation/` for placement guidance.
+See `.agents/skills/project-documentation/` for Diátaxis and placement guidance.
 
 ---
 

@@ -42,7 +42,7 @@ Developers need small, opinionated Dev Container features that complement offici
 
 - Custom Dev Container features under `src/`.
 - Validate, lint, pre-publish feature tests on official base images, publish, and post-publish smoke-test automation in `.github/workflows/`.
-- Documentation for contributors and feature consumers (README, CONTRIBUTING, per-feature README).
+- Documentation for contributors and feature consumers (README, CONTRIBUTING, per-feature README, and the MkDocs site under `docs/`).
 
 ### Out of scope
 

@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        feature: [copilot-likes, spec-kit]
+        feature: [dev-agent-tools, spec-kit]
         baseImage:
           # Keep in sync with scripts/official-base-images.txt
           - mcr.microsoft.com/devcontainers/base:ubuntu

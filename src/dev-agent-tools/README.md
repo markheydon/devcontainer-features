@@ -1,6 +1,8 @@
-# Copilot Likes
+# Dev Agent Tools
 
-Opinionated Dev Container feature with CLI tools and small UX defaults that GitHub Copilot and similar agents often assume are already installed.
+Opinionated Dev Container feature with CLI tools and small UX defaults that coding agents often assume are already installed. This feature is **not** the GitHub Copilot product—the legacy GHCR id `copilot-likes` exists only for backward compatibility.
+
+Consumer documentation: [Dev Agent Tools on the docs site](https://markheydon.github.io/devcontainer-features/features/dev-agent-tools/).
 
 ## What gets installed
 
@@ -25,22 +27,32 @@ Opinionated Dev Container feature with CLI tools and small UX defaults that GitH
 **Configuration (re-applied on every install; safe to re-run)**
 
 - System git pager set to `delta` when git is available.
-- `/etc/profile.d/copilot-likes.sh`: direnv hook for bash, aliases (`ll`, `ls` → eza; `cat` → bat; `grep` → rg).
+- `/etc/profile.d/dev-agent-tools.sh`: direnv hook for bash, agent-friendly aliases (`ll`, `ls` → eza; `cat` → bat; `grep` → rg), and a simple `PS1` when `CURSOR_AGENT` is set.
 
 ## Consumer `devcontainer.json`
 
 Published reference: use the major tag `:1` unless you need a pinned semver (see the root [README](../../README.md#using-a-feature)).
 
-**Microsoft dev container base (recommended):** the base this repo uses in its [maintainer dev container](../../.devcontainer/README.md) already includes [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils).
+**Canonical id:**
 
 ```json
 {
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {}
+    "ghcr.io/markheydon/devcontainer-features/dev-agent-tools:1": {}
   }
 }
 ```
+
+**Legacy id** (still updated via `legacyIds` when published from this repository):
+
+```json
+"ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {}
+```
+
+Migrate to `dev-agent-tools` when convenient so AI-assisted refactors do not confuse this feature with GitHub Copilot. See [Legacy feature ids](https://markheydon.github.io/devcontainer-features/guides/legacy-feature-ids/).
+
+**Microsoft dev container base (recommended):** the base this repo uses in its [maintainer dev container](../../.devcontainer/README.md) already includes [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils).
 
 **Plain or minimal base:** list common-utils when your image does not already provide it:
 
@@ -49,7 +61,7 @@ Published reference: use the major tag `:1` unless you need a pinned semver (see
   "image": "ubuntu:24.04",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/markheydon/devcontainer-features/copilot-likes:1": {}
+    "ghcr.io/markheydon/devcontainer-features/dev-agent-tools:1": {}
   }
 }
 ```
@@ -73,7 +85,7 @@ Unpublished installs use a repo-relative path:
 
 ```json
 "features": {
-  "../src/copilot-likes": {}
+  "../src/dev-agent-tools": {}
 }
 ```
 
