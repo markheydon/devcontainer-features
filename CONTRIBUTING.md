@@ -66,7 +66,7 @@ Bump the feature **`version`** in `devcontainer-feature.json` whenever install-t
 
 If you add tools that should be verified in CI, extend `test/<feature-id>/test.sh` and keep the post-publish smoke test ([test.yml](.github/workflows/test.yml)) in sync.
 
-Changes to **spec-kit** `postCreateCommand` or sync behaviour also affect `test/spec-kit/sync-target-version.txt` and the spec-kit smoke job in `test.yml`; see [src/spec-kit/README.md](src/spec-kit/README.md#testing) and [CONVENTIONS.md](CONVENTIONS.md#testing).
+Changes to **spec-kit** or **aspire-cli** `postCreateCommand` or sync behaviour also affect the matching `test/<feature-id>/sync-target-version.txt` and smoke job in `test.yml`; see the feature README (Testing) and [CONVENTIONS.md](CONVENTIONS.md#testing).
 
 ## Project intent
 

@@ -25,7 +25,7 @@ The legacy id `copilot-likes` still publishes alongside `dev-agent-tools` for ba
 
 While developing in this repository, point at a local feature folder instead of GHCR — see [CONTRIBUTING.md](CONTRIBUTING.md#testing-locally).
 
-Some features declare `installsAfter` in metadata (for example **dev-agent-tools** and **spec-kit** list [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils)). List that dependency in your `features` block **only when your base image does not already include it**. Official Microsoft dev container images such as [`mcr.microsoft.com/devcontainers/base:ubuntu`](https://github.com/devcontainers/images/blob/main/src/base-ubuntu/README.md) are built with common-utils already applied; listing it again adds an extra feature layer with little benefit. If you omit the dependency, the Dev Containers CLI still resolves install order—it treats `installsAfter` as a soft dependency when the named feature is not requested. See the [docs site](https://markheydon.github.io/devcontainer-features/guides/common-utils/) for examples.
+Some features declare `installsAfter` in metadata (for example **dev-agent-tools**, **spec-kit**, and **aspire-cli** list [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils)). List that dependency in your `features` block **only when your base image does not already include it**. Official Microsoft dev container images such as [`mcr.microsoft.com/devcontainers/base:ubuntu`](https://github.com/devcontainers/images/blob/main/src/base-ubuntu/README.md) are built with common-utils already applied; listing it again adds an extra feature layer with little benefit. If you omit the dependency, the Dev Containers CLI still resolves install order—it treats `installsAfter` as a soft dependency when the named feature is not requested. See the [docs site](https://markheydon.github.io/devcontainer-features/guides/common-utils/) for examples.
 
 ## Features
 
@@ -33,6 +33,7 @@ Some features declare `installsAfter` in metadata (for example **dev-agent-tools
 |---------|-------------|
 | [dev-agent-tools](src/dev-agent-tools/README.md) · [docs](https://markheydon.github.io/devcontainer-features/features/dev-agent-tools/) | Opinionated CLI tools, git diff defaults, and shell aliases for agent-assisted workflows |
 | [spec-kit](src/spec-kit/README.md) · [docs](https://markheydon.github.io/devcontainer-features/features/spec-kit/) | Self-contained GitHub Spec Kit toolchain (uv, Python when needed, Specify CLI) without VS Code Python extensions |
+| [aspire-cli](src/aspire-cli/README.md) · [docs](https://markheydon.github.io/devcontainer-features/features/aspire-cli/) | User-scoped Aspire CLI via the official installer, with optional bundle setup and repo SDK alignment on create |
 
 ## Contributing
 

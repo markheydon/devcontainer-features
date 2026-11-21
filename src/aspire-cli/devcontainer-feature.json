@@ -1,0 +1,34 @@
+{
+  "id": "aspire-cli",
+  "version": "1.0.1",
+  "name": "Aspire CLI",
+  "description": "User-writable Aspire CLI install via the official installer (~/.aspire), with optional bundle setup and create-time alignment to the repo Aspire SDK pin.",
+  "documentationURL": "https://github.com/markheydon/devcontainer-features/tree/main/src/aspire-cli",
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils"
+  ],
+  "options": {
+    "aspireVersion": {
+      "type": "string",
+      "default": "latest",
+      "description": "Aspire CLI version passed to the official installer, or latest for the selected quality at image build with optional repo alignment on container create."
+    },
+    "quality": {
+      "type": "string",
+      "proposals": ["release", "staging", "dev"],
+      "default": "release",
+      "description": "Installer quality when aspireVersion is latest. Ignored when aspireVersion is pinned."
+    },
+    "bundlePath": {
+      "type": "string",
+      "default": "",
+      "description": "Directory for aspire setup bundle extraction. Empty uses $HOME/.aspire/bundle under the container user."
+    },
+    "runSetupOnInstall": {
+      "type": "boolean",
+      "default": true,
+      "description": "Run aspire setup --non-interactive after installing or updating the CLI."
+    }
+  },
+  "postCreateCommand": "/usr/local/share/aspire-cli/sync-aspire-version.sh"
+}

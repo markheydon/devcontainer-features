@@ -111,3 +111,38 @@ jobs:
       - name: Run container and verify installation
         run: |
           devcontainer exec --workspace-folder . env SPEC_KIT_SYNC_VERIFY_ONLY=1 bash test/spec-kit/test.sh
+
+  test-aspire-cli:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Create test devcontainer.json
+        run: |
+          mkdir -p .devcontainer
+          SYNC_PIN="$(tr -d '[:space:]' < test/aspire-cli/sync-target-version.txt)"
+          printf '{"sdk": {"version": "%s"}}\n' "${SYNC_PIN}" > aspire.config.json
+          cat > .devcontainer/devcontainer.json << EOF
+          {
+            "name": "Test Aspire CLI Feature",
+            "image": "mcr.microsoft.com/devcontainers/dotnet:latest",
+            "features": {
+              "ghcr.io/${{ github.repository_owner }}/devcontainer-features/aspire-cli:latest": {
+                "aspireVersion": "latest"
+              }
+            }
+          }
+          EOF
+
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Start dev container
+        run: devcontainer up --workspace-folder .
+
+      - name: Run container and verify installation
+        run: |
+          devcontainer exec --workspace-folder . env ASPIRE_CLI_SYNC_VERIFY_ONLY=1 bash test/aspire-cli/test.sh

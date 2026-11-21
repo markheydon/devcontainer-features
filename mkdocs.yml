@@ -33,6 +33,7 @@ nav:
   - Features:
       - Dev Agent Tools: features/dev-agent-tools.md
       - Spec Kit: features/spec-kit.md
+      - Aspire CLI: features/aspire-cli.md
   - Contributing: contributing.md
 
 markdown_extensions:
