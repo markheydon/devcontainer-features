@@ -20,6 +20,9 @@ export UV_PYTHON_INSTALL_DIR="${UV_PREFIX}/python"
 export UV_PYTHON_BIN_DIR="/usr/local/bin"
 export UV_CACHE_DIR="${UV_PREFIX}/cache"
 
+# Modules must include those required by specify-cli / Typer (e.g. uuid on python3-minimal).
+PYTHON3_STDLIB_PROBE='import json, shutil, sys, uuid; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+
 apt-get update
 apt-get install -y --no-install-recommends ca-certificates curl
 apt-get clean
@@ -27,7 +30,7 @@ rm -rf /var/lib/apt/lists/*
 
 python3_is_healthy() {
     command -v python3 >/dev/null 2>&1 \
-        && python3 -c 'import json, shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+        && python3 -c "${PYTHON3_STDLIB_PROBE}"
 }
 
 managed_python_requested() {
@@ -196,6 +199,8 @@ SPECIFYVERSION="${SPECIFYVERSION}"
 PYTHONVERSION="${PYTHONVERSION}"
 MANAGEDPYTHON="${MANAGEDPYTHON}"
 
+PYTHON3_STDLIB_PROBE='${PYTHON3_STDLIB_PROBE}'
+
 export UV_TOOL_DIR="${UV_TOOL_DIR}"
 export UV_TOOL_BIN_DIR="${UV_TOOL_BIN_DIR}"
 export UV_PYTHON_INSTALL_DIR="${UV_PYTHON_INSTALL_DIR}"
@@ -210,7 +215,7 @@ json_python_cmd() {
         return 0
     fi
     if command -v python3 >/dev/null 2>&1 \
-        && python3 -c 'import json, pathlib, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' 2>/dev/null; then
+        && python3 -c "${PYTHON3_STDLIB_PROBE}" 2>/dev/null; then
         printf '%s' 'python3'
         return 0
     fi
@@ -219,7 +224,7 @@ json_python_cmd() {
 
 python3_is_healthy() {
     command -v python3 >/dev/null 2>&1 \
-        && python3 -c 'import json, shutil, sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'
+        && python3 -c "${PYTHON3_STDLIB_PROBE}"
 }
 
 managed_python_requested() {
