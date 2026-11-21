@@ -33,6 +33,7 @@ Some features declare `installsAfter` in metadata (for example **dev-agent-tools
 |---------|-------------|
 | [dev-agent-tools](src/dev-agent-tools/README.md) · [docs](https://markheydon.github.io/devcontainer-features/features/dev-agent-tools/) | Opinionated CLI tools, git diff defaults, and shell aliases for agent-assisted workflows |
 | [spec-kit](src/spec-kit/README.md) · [docs](https://markheydon.github.io/devcontainer-features/features/spec-kit/) | Self-contained GitHub Spec Kit toolchain (uv, Python when needed, Specify CLI) without VS Code Python extensions |
+| [aspire-cli](src/aspire-cli/README.md) · [docs](https://markheydon.github.io/devcontainer-features/features/aspire-cli/) | User-scoped Aspire CLI via the official installer, with optional bundle setup and repo SDK alignment on create |
 
 ## Contributing
 

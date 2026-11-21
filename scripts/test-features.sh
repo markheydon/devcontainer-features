@@ -104,6 +104,11 @@ run_assertions() {
     sync_pin="$(tr -d '[:space:]' < "${REPO_ROOT}/test/spec-kit/sync-target-version.txt")"
     docker_env=(-e "PYTHONVERSION=3.12" -e "SPEC_KIT_SYNC_TARGET_VERSION=${sync_pin}")
   fi
+  if [[ "${feature}" == "aspire-cli" ]]; then
+    local aspire_pin
+    aspire_pin="$(tr -d '[:space:]' < "${REPO_ROOT}/test/aspire-cli/sync-target-version.txt")"
+    docker_env=(-e "ASPIRE_CLI_SYNC_TARGET_VERSION=${aspire_pin}")
+  fi
 
   if [[ "${VERBOSE}" == "1" ]]; then
     docker run --rm "${docker_env[@]}" "${image_ref}" /bin/bash -c "$(cat "${test_script}")"
