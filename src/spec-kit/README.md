@@ -106,6 +106,7 @@ See the [Spec Kit installation guide](https://github.github.io/spec-kit/installa
 ## Base image expectations
 
 - **Debian-family** images with `apt` (CI uses `mcr.microsoft.com/devcontainers/base:ubuntu`).
+- **Microsoft .NET images** (`mcr.microsoft.com/devcontainers/dotnet:*`) often ship `python3-minimal` only. That interpreter can be 3.11+ but lacks stdlib modules `specify-cli` needs (for example `uuid`). With default `managedPython: auto`, the feature detects this via a stdlib probe and runs `uv python install` instead of using system `python3`.
 - **Non-root create:** `postCreateCommand` runs version sync as the container user. Reinstalling `specify-cli` under `/opt/uv` uses **passwordless `sudo`** when the user is not root. Official Microsoft dev container images (and `common-utils`) typically provide this; plain minimal images may need `common-utils` or equivalent sudo configuration.
 - **`installsAfter` `common-utils`:** metadata only orders features when both are present; on plain bases, add `ghcr.io/devcontainers/features/common-utils` explicitly (see consumer examples above).
 
