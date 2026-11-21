@@ -1,6 +1,6 @@
 # Common-utils dependency
 
-Several features in this collection declare `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) in `devcontainer-feature.json`.
+These features declare `installsAfter` [common-utils](https://github.com/devcontainers/features/tree/main/src/common-utils) in `devcontainer-feature.json`: [Dev Agent Tools](../features/dev-agent-tools.md), [Spec Kit](../features/spec-kit.md), and [Aspire CLI](../features/aspire-cli.md).
 
 ## Soft dependency
 
