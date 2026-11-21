@@ -6,7 +6,7 @@ Unlike `ghcr.io/microsoft/aspire-devcontainer-feature/aspire`, this feature inst
 
 **GHCR:** `ghcr.io/markheydon/devcontainer-features/aspire-cli:1`
 
-Full option reference, `remoteEnv` guidance, and testing notes: [src/aspire-cli/README.md](https://github.com/markheydon/devcontainer-features/blob/main/src/aspire-cli/README.md).
+Full option reference, PATH notes, and testing: [src/aspire-cli/README.md](https://github.com/markheydon/devcontainer-features/blob/main/src/aspire-cli/README.md).
 
 ## Example `devcontainer.json`
 
@@ -17,18 +17,13 @@ Full option reference, `remoteEnv` guidance, and testing notes: [src/aspire-cli/
     "ghcr.io/markheydon/devcontainer-features/aspire-cli:1": {
       "aspireVersion": "latest"
     }
-  },
-  "remoteEnv": {
-    "PATH": "${containerEnv:HOME}/.aspire/bin:${containerEnv:PATH}",
-    "ASPIRE_HOME": "${containerEnv:HOME}/.aspire",
-    "ASPIRE_LAYOUT_PATH": "${containerEnv:HOME}/.aspire/bundle"
   }
 }
 ```
 
 Pin `aspireVersion` when you need reproducible image builds instead of `latest`.
 
-Add `remoteEnv` (see example) so integrated terminals and the Aspire VS Code extension see `~/.aspire/bin` on `PATH`; login shells also use profile snippets from the feature.
+Login and interactive bash terminals get `aspire` on `PATH` from profile snippets installed by the feature. Add optional `remoteEnv` when you need the Aspire VS Code extension or other non-login processes to resolve `aspire`—see [Container environment](https://github.com/markheydon/devcontainer-features/blob/main/src/aspire-cli/README.md#container-environment) in the feature README.
 
 With `aspireVersion: latest`, create-time sync can align the CLI to a single SDK pin in the workspace (for example `aspire.config.json`). Pin `aspireVersion` to skip that step.
 

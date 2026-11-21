@@ -27,16 +27,13 @@ This feature does **not** install a .NET SDK. Use `mcr.microsoft.com/devcontaine
     "ghcr.io/markheydon/devcontainer-features/aspire-cli:1": {
       "aspireVersion": "latest"
     }
-  },
-  "remoteEnv": {
-    "PATH": "${containerEnv:HOME}/.aspire/bin:${containerEnv:PATH}",
-    "ASPIRE_HOME": "${containerEnv:HOME}/.aspire",
-    "ASPIRE_LAYOUT_PATH": "${containerEnv:HOME}/.aspire/bundle"
   }
 }
 ```
 
 Pin `aspireVersion` to a semver (for example `"17.0.0"`) when you need reproducible image builds instead of `latest`.
+
+Login and interactive bash shells pick up `aspire` on `PATH` from `/etc/profile.d/aspire-cli.sh` and the user’s `.bashrc` / `.profile` snippet—no extra `devcontainer.json` configuration required for typical CLI use in the terminal.
 
 **Plain or minimal base:** when your image does not already provide common-utils, add it so `installsAfter` ordering is explicit:
 
@@ -63,9 +60,19 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 
 ## Container environment
 
-Feature metadata does not set `containerEnv` paths under the remote user’s home (the features spec does not expand `_REMOTE_USER_HOME` in metadata). Use `remoteEnv` in your `devcontainer.json` (see example above) so integrated terminals, the Aspire VS Code extension (`command: aspire`), and other non-login processes see `~/.aspire/bin` on `PATH`.
+The CLI lives under the container user’s home, not `/usr/local/bin`. Feature metadata cannot set `containerEnv` paths that depend on that home directory—the devcontainers spec does not expand `_REMOTE_USER_HOME` in `devcontainer-feature.json` ([devcontainers/cli#391](https://github.com/devcontainers/cli/issues/391)).
 
-Login shells also pick up `/etc/profile.d/aspire-cli.sh` and the user’s `.bashrc` / `.profile` snippet.
+For **Aspire VS Code extension**, tasks, or other processes that do not run a login shell, add `remoteEnv` so `~/.aspire/bin` is on `PATH` and layout variables are set:
+
+```json
+"remoteEnv": {
+  "PATH": "${containerEnv:HOME}/.aspire/bin:${containerEnv:PATH}",
+  "ASPIRE_HOME": "${containerEnv:HOME}/.aspire",
+  "ASPIRE_LAYOUT_PATH": "${containerEnv:HOME}/.aspire/bundle"
+}
+```
+
+You can omit `remoteEnv` when you only use `aspire` from a login or interactive bash terminal (see above).
 
 ## After the container builds
 
