@@ -1,6 +1,26 @@
 version: 2
 
 updates:
+  - package-ecosystem: pip
+    directory: /docs
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:00"
+      timezone: Europe/London
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    assignees:
+      - markheydon
+    groups:
+      pip-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -18,11 +38,12 @@ updates:
         patterns:
           - "*"
         update-types:
+          - major
           - minor
           - patch
 
   - package-ecosystem: devcontainers
-    directory: /.devcontainer
+    directory: /
     schedule:
       interval: weekly
       day: monday
