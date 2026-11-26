@@ -24,12 +24,14 @@ CI splits three concerns (all driven by `test/aspire-cli/test.sh`):
 
 **If sync tests fail** because release `latest` equals the pin or the pin is unavailable from the installer: choose an older version still published on the Aspire download feeds (for example below current release `17.0.0`) and update `test/aspire-cli/sync-target-version.txt`.
 
-Manual check (with Docker on the host):
+Manual checks (with Docker on the host):
 
 ```bash
 shellcheck src/aspire-cli/install.sh
 ./scripts/test-features.sh aspire-cli mcr.microsoft.com/devcontainers/dotnet:latest
 ```
+
+`./scripts/test-features.sh` covers install, layout, and simulated sync only. **`aspire run`** workflow coverage runs in post-publish job `test-aspire-cli-workflow` (fixture `test/aspire-cli/fixtures/run-smoke/`, `ASPIRE_CLI_WORKFLOW_VERIFY=1`).
 
 ## Development in this repository
 

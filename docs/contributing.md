@@ -2,7 +2,7 @@
 
 Documentation for **contributors and maintainers** of this feature collection lives in the repository:
 
-- [CONTRIBUTING.md](https://github.com/markheydon/devcontainer-features/blob/main/CONTRIBUTING.md) — adding features, local tests, pull requests
+- [CONTRIBUTING.md](https://github.com/markheydon/devcontainer-features/blob/main/CONTRIBUTING.md) — adding features, local tests, pull requests (including **signed commits** on the default branch)
 - [CONVENTIONS.md](https://github.com/markheydon/devcontainer-features/blob/main/CONVENTIONS.md) — layout, CI, install script patterns
 
 The [maintainer development container](https://github.com/markheydon/devcontainer-features/blob/main/.devcontainer/README.md) includes ShellCheck, the Dev Container CLI, and scripts for feature tests.

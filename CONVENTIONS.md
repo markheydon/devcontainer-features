@@ -76,7 +76,7 @@ shellcheck src/**/install.sh
 - **Validate:** Caught on every PR via `validate.yml`.
 - **ShellCheck:** Caught on every PR via `lint.yml`.
 - **Feature tests (PR / `main`):** [feature-test.yml](.github/workflows/feature-test.yml) runs `./scripts/test-features.sh <feature-id> <base-image>` for each matrix combination. The workflow matrix defines which images CI uses; [scripts/official-base-images.txt](scripts/official-base-images.txt) is the default list for a full local matrix via `./scripts/test-features.sh` with no arguments. Assertions live in `test/<feature-id>/test.sh`.
-- **Smoke test:** After publish, `test.yml` builds a minimal devcontainer that references the published feature and runs the same `test.sh` scripts. The workflow is representative of consumer references (published URI, `latest` tag). Keep the table below in sync when you extend install behaviour or add CI checks.
+- **Smoke test:** After publish, `test.yml` builds a minimal devcontainer that references the published feature and runs assertions from `test/<feature-id>/test.sh` (published URI, `:latest` tag). Most jobs use this repository checkout as `workspace-folder`; **aspire-cli** uses separate ephemeral workspaces for sync and workflow smoke (ADR-0002). Keep the table below in sync when you extend install behaviour or add CI checks.
 
 | Feature | Asserted in `test/<feature-id>/test.sh` | Installed but not asserted in CI (document in feature README) |
 |---------|------------------------|------------------------------------------------------------------|

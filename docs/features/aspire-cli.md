@@ -57,7 +57,7 @@ Consumers often ask why this repository publishes **`aspire-cli`** instead of [`
 
 Pin `aspireVersion` to a semver (for example `"17.0.0"`) when you need reproducible image builds instead of `latest`.
 
-Login and interactive bash shells pick up `aspire` on `PATH` from `/etc/profile.d/aspire-cli.sh` and the user’s `.bashrc` / `.profile` snippet—no extra `devcontainer.json` configuration required for typical CLI use in the terminal.
+Login and interactive bash shells pick up `aspire` on `PATH` from `/etc/profile.d/aspire-cli.sh` and the user’s `.bashrc` / `.profile` snippet—no extra `devcontainer.json` configuration required for typical CLI use in the terminal. Run **`aspire run`** from your AppHost project root in a login shell (or set `remoteEnv` as below) so the CLI is on `PATH` for non-interactive invocations.
 
 **Plain or minimal base:** when your image does not already provide common-utils, add it so `installsAfter` ordering is explicit:
 
@@ -101,9 +101,7 @@ Earlier releases defaulted the layout path to `~/.aspire/bundle`. **Aspire 17+**
 
 ## After the container builds
 
-With `aspireVersion: latest` (the default), `postCreateCommand` runs `/usr/local/share/aspire-cli/sync-aspire-version.sh`. When the workspace contains a single Aspire SDK pin (for example `aspire.config.json` → `sdk.version`, or `Aspire.Hosting.AppHost` / `Aspire.AppHost.Sdk` in project files) and the installed CLI differs, the script reinstalls that CLI version and re-runs setup when enabled. Sync only runs when `aspireVersion` was `latest` at image build. Multiple conflicting SDK pins or a missing `python3` at create time fail the sync step instead of succeeding silently.
-
-Post-publish CI includes a **workflow** smoke job that builds a dev container against a minimal Aspire app workspace and runs `aspire run` from the project root via a login shell (described in the feature README under Testing).
+With `aspireVersion: latest` (the default), `postCreateCommand` runs `/usr/local/share/aspire-cli/sync-aspire-version.sh`. When the workspace contains a single Aspire SDK pin (for example `aspire.config.json` → `sdk.version`, or `Aspire.Hosting.AppHost` / `Aspire.AppHost.Sdk` in project files) and the installed CLI differs, the script reinstalls that CLI version and re-runs setup when enabled. Sync only runs when `aspireVersion` was `latest` at image build. Multiple conflicting SDK pins or a missing `python3` at create time fail the sync step instead of succeeding silently. The scanner walks your **workspace** tree—keep unrelated Aspire pins out of the repo root if you only mean to align one app.
 
 The official installer script is fetched from `https://aspire.dev/install.sh` without a checksum pin (Aspire does not publish a stable checksum for that URL). Pin `aspireVersion` when you need reproducible installs or stricter supply-chain control.
 
