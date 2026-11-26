@@ -137,6 +137,8 @@ jobs:
             }
           }
           EOF
+          mkdir -p "${WORKSPACE}/.aspire-test"
+          cp test/aspire-cli/test.sh "${WORKSPACE}/.aspire-test/test.sh"
           echo "ASPIRE_SYNC_WORKSPACE=${WORKSPACE}" >> "${GITHUB_ENV}"
 
       - name: Install Dev Container CLI
@@ -149,7 +151,7 @@ jobs:
         run: |
           devcontainer exec --workspace-folder "${ASPIRE_SYNC_WORKSPACE}" \
             env ASPIRE_CLI_SYNC_VERIFY_ONLY=1 \
-            bash "${GITHUB_WORKSPACE}/test/aspire-cli/test.sh"
+            bash .aspire-test/test.sh
 
   test-aspire-cli-workflow:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -175,6 +177,8 @@ jobs:
             }
           }
           EOF
+          mkdir -p "${WORKSPACE}/.aspire-test"
+          cp test/aspire-cli/test.sh "${WORKSPACE}/.aspire-test/test.sh"
           echo "ASPIRE_APP_WORKSPACE=${WORKSPACE}" >> "${GITHUB_ENV}"
 
       - name: Install Dev Container CLI
@@ -187,4 +191,4 @@ jobs:
         run: |
           devcontainer exec --workspace-folder "${ASPIRE_APP_WORKSPACE}" \
             env ASPIRE_CLI_WORKFLOW_VERIFY=1 \
-            bash "${GITHUB_WORKSPACE}/test/aspire-cli/test.sh"
+            bash .aspire-test/test.sh

@@ -32,8 +32,6 @@ resolve_sync_target_version() {
   return 1
 }
 
-sync_target_version="$(resolve_sync_target_version)"
-
 check() {
   local label="$1"
   shift
@@ -82,7 +80,8 @@ dev_container_user() {
 }
 
 simulate_postcreate_sync() {
-  local before user workspace aspire_bin layout home_layout
+  local before user workspace aspire_bin layout home_layout sync_target_version
+  sync_target_version="$(resolve_sync_target_version)"
   if [[ ! -x "${sync_script}" ]]; then
     echo "Missing executable ${sync_script}" >&2
     return 1
