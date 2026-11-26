@@ -3,9 +3,9 @@
 # Conventions
 
 **Project:** devcontainer-features  
-**Last updated:** 2026-11-11
+**Last updated:** 2026-11-26
 
-When in doubt, follow this file. Rare cross-feature policy changes may warrant an ADR if the user asks to record them.
+When in doubt, follow this file. Recorded cross-feature decisions live in [`adr/`](adr/). Rare new policy changes may warrant an ADR when the user asks to record them.
 
 ---
 
