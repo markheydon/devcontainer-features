@@ -15,11 +15,6 @@ aspire_user_home() {
   printf '%s' "${HOME}"
 }
 
-ASPIRE_USER_HOME="$(aspire_user_home)"
-export PATH="${ASPIRE_USER_HOME}/.aspire/bin:${PATH}"
-export ASPIRE_HOME="${ASPIRE_USER_HOME}/.aspire"
-export ASPIRE_LAYOUT_PATH="${ASPIRE_LAYOUT_PATH:-${ASPIRE_USER_HOME}/.aspire}"
-
 resolve_sync_target_version() {
   if [[ -n "${ASPIRE_CLI_SYNC_TARGET_VERSION:-}" ]]; then
     printf '%s' "${ASPIRE_CLI_SYNC_TARGET_VERSION}"
@@ -36,8 +31,6 @@ resolve_sync_target_version() {
   echo "Set ASPIRE_CLI_SYNC_TARGET_VERSION or provide test/aspire-cli/sync-target-version.txt" >&2
   return 1
 }
-
-sync_target_version="$(resolve_sync_target_version)"
 
 check() {
   local label="$1"
@@ -87,7 +80,8 @@ dev_container_user() {
 }
 
 simulate_postcreate_sync() {
-  local before user workspace aspire_bin layout home_layout
+  local before user workspace aspire_bin layout home_layout sync_target_version
+  sync_target_version="$(resolve_sync_target_version)"
   if [[ ! -x "${sync_script}" ]]; then
     echo "Missing executable ${sync_script}" >&2
     return 1
@@ -119,7 +113,7 @@ simulate_postcreate_sync() {
 
   if [[ "$(id -un)" == "${user}" ]]; then
     echo "Running sync-aspire-version.sh as ${user} (current user)"
-  (
+    (
       cd "${workspace}"
       env PATH="$(dirname "${aspire_bin}"):${PATH}" \
         ASPIRE_HOME="${HOME}/.aspire" \
@@ -191,12 +185,13 @@ aspire_cli_major_version() {
 }
 
 check_bundle_symlink_for_aspire_17() {
-  local major bundle
+  local major bundle user_home
+  user_home="$(aspire_user_home)"
   major="$(aspire_cli_major_version || true)"
   if [[ -z "${major}" ]] || [[ "${major}" -lt 17 ]]; then
     return 0
   fi
-  bundle="${ASPIRE_USER_HOME}/.aspire/bundle"
+  bundle="${user_home}/.aspire/bundle"
   if [[ ! -L "${bundle}" ]]; then
     if [[ -d "${bundle}" ]]; then
       echo "Expected ${bundle} to be a symlink for Aspire 17+, got a directory" >&2
@@ -207,57 +202,9 @@ check_bundle_symlink_for_aspire_17() {
   fi
 }
 
-# Mirror of test/aspire-cli/fixtures/run-smoke/ (same tree on disk for review; this hook
-# materialises it because feature tests are often piped into bash -c without the repo mount).
-write_run_smoke_fixture() {
-  local dest="$1"
-  mkdir -p "${dest}/AppHost"
-  cat >"${dest}/aspire.config.json" <<'JSON'
-{
-  "appHost": {
-    "path": "AppHost/Program.cs",
-    "language": "csharp"
-  },
-  "sdk": {
-    "version": "17.0.0"
-  }
-}
-JSON
-  cat >"${dest}/AppHost/Program.cs" <<'CS'
-#:package Aspire.Hosting.AppHost@17.0.0
-
-var builder = DistributedApplication.CreateBuilder(args);
-builder.Build().Run();
-CS
-}
-
-check_aspire_run_bundle_smoke() {
-  local major logfile fixture_dir
-  major="$(aspire_cli_major_version || true)"
-  if [[ -z "${major}" ]] || [[ "${major}" -lt 17 ]]; then
-    return 0
-  fi
-  if ! command -v dotnet >/dev/null 2>&1; then
-    echo "Skipping aspire run smoke: dotnet SDK not on this base image" >&2
-    return 0
-  fi
-  fixture_dir="$(mktemp -d)"
-  logfile="$(mktemp)"
-  # shellcheck disable=SC2064
-  trap 'rm -rf "${fixture_dir:-}" "${logfile:-}"' RETURN
-  write_run_smoke_fixture "${fixture_dir}"
-  local run_status=0
-  set +e
-  (
-    cd "${fixture_dir}"
-    timeout 180 env \
-      PATH="${PATH}" \
-      ASPIRE_HOME="${ASPIRE_HOME}" \
-      ASPIRE_LAYOUT_PATH="${ASPIRE_LAYOUT_PATH}" \
-      aspire run
-  ) >"${logfile}" 2>&1
-  run_status=$?
-  set -e
+assert_aspire_run_log() {
+  local logfile="$1"
+  local run_status="$2"
   if [[ "${run_status}" -eq 124 ]]; then
     if ! grep -qiE 'DistributedApplication|AppHost|dotnet.*restore|Building' "${logfile}"; then
       echo "aspire run timed out before AppHost progress:" >&2
@@ -279,23 +226,65 @@ check_aspire_run_bundle_smoke() {
   head -n 20 "${logfile}"
 }
 
-check "sync script" test -x "${sync_script}"
-check "aspire on PATH" command -v aspire
-check "aspire not under /usr/local/bin" check_aspire_not_system_local
-check "aspire under user home" check_aspire_under_home
-check "aspire --version" aspire --version
-check "bundle symlink (Aspire 17+)" check_bundle_symlink_for_aspire_17
+verify_workflow_aspire_run() {
+  local major logfile run_status=0
+  if [[ ! -f aspire.config.json ]]; then
+    echo "Workflow verify requires aspire.config.json in the workspace root" >&2
+    return 1
+  fi
+  major="$(bash -l -c 'aspire --version 2>/dev/null | head -n1 | awk "{print \$1}" | cut -d. -f1' || true)"
+  if [[ -z "${major}" ]] || [[ "${major}" -lt 17 ]]; then
+    echo "Workflow verify requires Aspire CLI 17+ in login PATH, got major=${major:-<none>}" >&2
+    return 1
+  fi
+  if ! command -v dotnet >/dev/null 2>&1; then
+    echo "Workflow verify requires dotnet SDK on PATH" >&2
+    return 1
+  fi
+  logfile="$(mktemp)"
+  # shellcheck disable=SC2064
+  trap 'rm -f "${logfile:-}"' RETURN
+  set +e
+  bash -l -c "cd '$(pwd)' && timeout 180 aspire run" >"${logfile}" 2>&1
+  run_status=$?
+  set -e
+  assert_aspire_run_log "${logfile}" "${run_status}"
+}
 
-layout="${ASPIRE_LAYOUT_PATH:-${ASPIRE_USER_HOME}/.aspire}"
-check "aspire setup" env ASPIRE_LAYOUT_PATH="${layout}" aspire setup --non-interactive
-check "aspire run (bundle smoke)" check_aspire_run_bundle_smoke
+export_path_for_install_checks() {
+  local user_home
+  user_home="$(aspire_user_home)"
+  export PATH="${user_home}/.aspire/bin:${PATH}"
+  export ASPIRE_HOME="${user_home}/.aspire"
+  export ASPIRE_LAYOUT_PATH="${ASPIRE_LAYOUT_PATH:-${user_home}/.aspire}"
+}
+
+run_install_layout_checks() {
+  export_path_for_install_checks
+  local layout="${ASPIRE_LAYOUT_PATH:-$(aspire_user_home)/.aspire}"
+  check "sync script" test -x "${sync_script}"
+  check "aspire on PATH" command -v aspire
+  check "aspire not under /usr/local/bin" check_aspire_not_system_local
+  check "aspire under user home" check_aspire_under_home
+  check "aspire --version" aspire --version
+  check "bundle symlink (Aspire 17+)" check_bundle_symlink_for_aspire_17
+  check "aspire setup" env ASPIRE_LAYOUT_PATH="${layout}" aspire setup --non-interactive
+  check "postCreate sync (simulate)" simulate_postcreate_sync
+}
+
+if [[ "${ASPIRE_CLI_WORKFLOW_VERIFY:-0}" == "1" ]]; then
+  check "developer workflow (aspire run from workspace)" verify_workflow_aspire_run
+  exit 0
+fi
 
 if [[ "${ASPIRE_CLI_SYNC_VERIFY_ONLY:-0}" == "1" ]]; then
+  export_path_for_install_checks
   if [[ ! -f aspire.config.json ]]; then
-    echo "ASPIRE_CLI_SYNC_VERIFY_ONLY set but aspire.config.json is missing" >&2
+    echo "ASPIRE_CLI_SYNC_VERIFY_ONLY set but aspire.config.json is missing in workspace" >&2
     exit 1
   fi
   check "postCreate sync (workspace aspire.config.json)" verify_postcreate_sync_result
-else
-  check "postCreate sync (simulate)" simulate_postcreate_sync
+  exit 0
 fi
+
+run_install_layout_checks

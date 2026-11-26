@@ -112,7 +112,7 @@ jobs:
         run: |
           devcontainer exec --workspace-folder . env SPEC_KIT_SYNC_VERIFY_ONLY=1 bash test/spec-kit/test.sh
 
-  test-aspire-cli:
+  test-aspire-cli-sync:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
@@ -120,14 +120,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Create test devcontainer.json
+      - name: Prepare sync smoke workspace
         run: |
-          mkdir -p .devcontainer
+          WORKSPACE="${RUNNER_TEMP}/aspire-sync-smoke"
+          mkdir -p "${WORKSPACE}/.devcontainer"
           SYNC_PIN="$(tr -d '[:space:]' < test/aspire-cli/sync-target-version.txt)"
-          printf '{"sdk": {"version": "%s"}}\n' "${SYNC_PIN}" > aspire.config.json
-          cat > .devcontainer/devcontainer.json << EOF
+          printf '{"sdk": {"version": "%s"}}\n' "${SYNC_PIN}" > "${WORKSPACE}/aspire.config.json"
+          cat > "${WORKSPACE}/.devcontainer/devcontainer.json" << EOF
           {
-            "name": "Test Aspire CLI Feature",
+            "name": "Test Aspire CLI sync smoke",
             "image": "mcr.microsoft.com/devcontainers/dotnet:latest",
             "features": {
               "ghcr.io/${{ github.repository_owner }}/devcontainer-features/aspire-cli:latest": {
@@ -136,13 +137,58 @@ jobs:
             }
           }
           EOF
+          mkdir -p "${WORKSPACE}/.aspire-test"
+          cp test/aspire-cli/test.sh "${WORKSPACE}/.aspire-test/test.sh"
+          echo "ASPIRE_SYNC_WORKSPACE=${WORKSPACE}" >> "${GITHUB_ENV}"
 
       - name: Install Dev Container CLI
         run: npm install -g @devcontainers/cli
 
       - name: Start dev container
-        run: devcontainer up --workspace-folder .
+        run: devcontainer up --workspace-folder "${ASPIRE_SYNC_WORKSPACE}"
 
-      - name: Run container and verify installation
+      - name: Verify postCreate sync
         run: |
-          devcontainer exec --workspace-folder . env ASPIRE_CLI_SYNC_VERIFY_ONLY=1 bash test/aspire-cli/test.sh
+          devcontainer exec --workspace-folder "${ASPIRE_SYNC_WORKSPACE}" \
+            env ASPIRE_CLI_SYNC_VERIFY_ONLY=1 \
+            bash .aspire-test/test.sh
+
+  test-aspire-cli-workflow:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Prepare Aspire app workspace
+        run: |
+          WORKSPACE="${RUNNER_TEMP}/aspire-app"
+          mkdir -p "${WORKSPACE}/.devcontainer"
+          cp -a test/aspire-cli/fixtures/run-smoke/. "${WORKSPACE}/"
+          cat > "${WORKSPACE}/.devcontainer/devcontainer.json" << EOF
+          {
+            "name": "Test Aspire CLI workflow smoke",
+            "image": "mcr.microsoft.com/devcontainers/dotnet:latest",
+            "features": {
+              "ghcr.io/${{ github.repository_owner }}/devcontainer-features/aspire-cli:latest": {
+                "aspireVersion": "latest"
+              }
+            }
+          }
+          EOF
+          mkdir -p "${WORKSPACE}/.aspire-test"
+          cp test/aspire-cli/test.sh "${WORKSPACE}/.aspire-test/test.sh"
+          echo "ASPIRE_APP_WORKSPACE=${WORKSPACE}" >> "${GITHUB_ENV}"
+
+      - name: Install Dev Container CLI
+        run: npm install -g @devcontainers/cli
+
+      - name: Start dev container
+        run: devcontainer up --workspace-folder "${ASPIRE_APP_WORKSPACE}"
+
+      - name: Verify aspire run from project root
+        run: |
+          devcontainer exec --workspace-folder "${ASPIRE_APP_WORKSPACE}" \
+            env ASPIRE_CLI_WORKFLOW_VERIFY=1 \
+            bash .aspire-test/test.sh

@@ -46,6 +46,17 @@ Project skills live in `.agents/skills/`.
 - Weaken `set -e` or idempotency patterns on install scripts.
 - Modify CI/CD behaviour.
 - Commit secrets or API keys.
+- Bypass commit signing or git hooks (for example `--no-gpg-sign`, `--no-verify`) when creating commits for this repository.
+
+## Git commits
+
+This repository requires **signed commits** on the default branch (GitHub ruleset: `required_signatures`). Commits merged to `main` must carry a valid OpenPGP (or SSH) signature that GitHub accepts.
+
+When creating commits locally:
+
+- Use normal `git commit` with signing enabled (`commit.gpgsign` / your usual signing setup). Do not pass `--no-gpg-sign` to work around a missing or misconfigured key.
+- Do not skip hooks with `--no-verify` unless the user explicitly asks for that exception.
+- If signing fails in the environment, stop and report the error; do not disable signing in git config or commit flags to proceed.
 
 ## Pull Request Workflow
 

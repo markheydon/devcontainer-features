@@ -14,6 +14,10 @@ Pull requests welcome.
 5. Ensure `install.sh` is idempotent and uses `set -e` (see [CONVENTIONS.md](CONVENTIONS.md)).
 6. Add a row to the **Features** table in the root [README.md](README.md).
 
+## Git commits
+
+The default branch requires **signed commits** (GitHub ruleset). Use your usual GPG or SSH commit signing for every commit you intend to merge; unsigned commits will be rejected on merge.
+
 ## Before you open a PR
 
 From the [development container](.devcontainer/README.md) (rebuild after feature changes there):
@@ -76,7 +80,7 @@ Bump the feature **`version`** in `devcontainer-feature.json` whenever install-t
 
 If you add tools that should be verified in CI, extend `test/<feature-id>/test.sh` and keep the post-publish smoke test ([test.yml](.github/workflows/test.yml)) in sync.
 
-Changes to **spec-kit** or **aspire-cli** `postCreateCommand` or sync behaviour also affect the matching `test/<feature-id>/sync-target-version.txt` and smoke job in `test.yml`; see the feature README (Testing) and [CONVENTIONS.md](CONVENTIONS.md#testing).
+Changes to **spec-kit** or **aspire-cli** `postCreateCommand` or sync behaviour also affect the matching `test/<feature-id>/sync-target-version.txt` and post-publish smoke in [test.yml](.github/workflows/test.yml) (`test-spec-kit`; for **aspire-cli**, jobs `test-aspire-cli-sync` and `test-aspire-cli-workflow`). See the feature README (Testing) and [CONVENTIONS.md](CONVENTIONS.md#testing).
 
 ## Project intent
 

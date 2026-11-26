@@ -16,16 +16,22 @@ Dev Container feature that installs the [Aspire CLI](https://aspire.dev/) into t
 
 ## Testing
 
-CI runs `test/aspire-cli/test.sh`, which asserts the CLI location, `aspire setup`, a `~/.aspire/bundle` symlink when the CLI is Aspire 17+, an **`aspire run`** bundle smoke (minimal AppHost; sources under `test/aspire-cli/fixtures/run-smoke/`, materialised in `test.sh` on images with the .NET SDK), and simulates `postCreate` sync against a fixture `sdk.version`. The pin lives in `test/aspire-cli/sync-target-version.txt` (override with `ASPIRE_CLI_SYNC_TARGET_VERSION`). Post-publish smoke writes the same pin into `aspire.config.json` and uses `ASPIRE_CLI_SYNC_VERIFY_ONLY=1` after `devcontainer up`.
+CI splits three concerns (all driven by `test/aspire-cli/test.sh`):
+
+1. **Install and layout** — [feature-test.yml](../../.github/workflows/feature-test.yml) / `./scripts/test-features.sh`: CLI under `~/.aspire/bin`, bundle symlink when CLI ≥ 17, `aspire setup`, and simulated `postCreate` sync in an isolated temp workspace (`ASPIRE_CLI_SYNC_TARGET_VERSION` from `test/aspire-cli/sync-target-version.txt`).
+2. **Post-publish sync** — [test.yml](../../.github/workflows/test.yml) job `test-aspire-cli-sync`: ephemeral workspace with only `.devcontainer` and pin `aspire.config.json`; `devcontainer up` then `ASPIRE_CLI_SYNC_VERIFY_ONLY=1`.
+3. **Developer workflow** — [test.yml](../../.github/workflows/test.yml) job `test-aspire-cli-workflow`: ephemeral workspace copied from `test/aspire-cli/fixtures/run-smoke/` (minimal AppHost); `devcontainer up` then `ASPIRE_CLI_WORKFLOW_VERIFY=1` runs `aspire run` from the project root via a login shell (no extra path env).
 
 **If sync tests fail** because release `latest` equals the pin or the pin is unavailable from the installer: choose an older version still published on the Aspire download feeds (for example below current release `17.0.0`) and update `test/aspire-cli/sync-target-version.txt`.
 
-Manual check (with Docker on the host):
+Manual checks (with Docker on the host):
 
 ```bash
 shellcheck src/aspire-cli/install.sh
 ./scripts/test-features.sh aspire-cli mcr.microsoft.com/devcontainers/dotnet:latest
 ```
+
+`./scripts/test-features.sh` covers install, layout, and simulated sync only. **`aspire run`** workflow coverage runs in post-publish job `test-aspire-cli-workflow` (fixture `test/aspire-cli/fixtures/run-smoke/`, `ASPIRE_CLI_WORKFLOW_VERIFY=1`).
 
 ## Development in this repository
 
