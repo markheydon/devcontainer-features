@@ -243,10 +243,8 @@ check_aspire_run_bundle_smoke() {
   fi
   fixture_dir="$(mktemp -d)"
   logfile="$(mktemp)"
-  cleanup_run_smoke() {
-    rm -rf "${fixture_dir:-}" "${logfile:-}"
-  }
-  trap cleanup_run_smoke RETURN
+  # shellcheck disable=SC2064
+  trap 'rm -rf "${fixture_dir:-}" "${logfile:-}"' RETURN
   write_run_smoke_fixture "${fixture_dir}"
   set +e
   (
