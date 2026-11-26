@@ -70,7 +70,7 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 |--------|---------|-------------|
 | `aspireVersion` | `latest` | Aspire CLI version for the installer, or `latest` for the selected `quality` at image build with repo alignment on create when an SDK pin is found. |
 | `quality` | `release` | Installer channel when `aspireVersion` is `latest` (`release`, `staging`, `dev`). Ignored when `aspireVersion` is pinned. |
-| `bundlePath` | *(empty)* | Aspire layout root for setup and `ASPIRE_LAYOUT_PATH`. Empty uses `$HOME/.aspire` for the container user. **Migration:** if you previously set this to `…/.aspire/bundle`, point it at the layout root (`…/.aspire`) instead—Aspire 17+ keeps `bundle/` as a symlink under that root. |
+| `bundlePath` | *(empty)* | Aspire layout root for setup and `ASPIRE_LAYOUT_PATH`. Empty uses `$HOME/.aspire` for the container user. **Migration:** if you previously set this to `…/.aspire/bundle`, point it at the layout root (`…/.aspire`) instead—Aspire 17+ keeps `bundle/` as a symlink under that root. Rebuild the dev container after upgrading so install rewrites shell snippets and `remoteEnv`. On a persisted home volume, remove a non-symlink `~/.aspire/bundle` directory manually if setup still reports legacy layout errors. |
 | `runSetupOnInstall` | `true` | Run `aspire setup --non-interactive` after install or CLI sync. |
 
 ## Container environment

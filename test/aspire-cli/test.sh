@@ -263,6 +263,13 @@ check_aspire_run_bundle_smoke() {
     cat "${logfile}" >&2
     return 1
   fi
+  if [[ "${run_status}" -eq 124 ]]; then
+    if ! grep -qiE 'DistributedApplication|AppHost|dotnet.*restore|Building' "${logfile}"; then
+      echo "aspire run timed out before AppHost progress:" >&2
+      cat "${logfile}" >&2
+      return 1
+    fi
+  fi
   if grep -qiE 'Bundle extraction failed|layout validation failed|Failed to rename legacy directory' "${logfile}"; then
     echo "aspire run hit a bundle layout failure:" >&2
     cat "${logfile}" >&2
