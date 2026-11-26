@@ -6,11 +6,13 @@ Pull requests welcome.
 
 1. Create a new folder under `src/<feature-id>` (kebab-case; must match feature `id` in JSON).
 2. Add:
-   - `devcontainer-feature.json`
+   - `devcontainer-feature.json` — set `documentationURL` to `https://markheydon.github.io/devcontainer-features/features/<feature-id>/`
    - `install.sh`
-   - `README.md` (recommended — packages and binaries, `installsAfter`, consumer JSON example, caveats)
-3. Ensure `install.sh` is idempotent and uses `set -e` (see [CONVENTIONS.md](CONVENTIONS.md)).
-4. Add a row to the **Features** table in the root [README.md](README.md).
+   - `README.md` (recommended — short install summary, link to the docs site, maintainer testing notes)
+3. Add `docs/features/<feature-id>.md` with the **consumer reference**: options table (or note when there are no options), `devcontainer.json` examples, lifecycle/caveats, and a source/contributing footer—not a pointer to the GitHub README for day-to-day use.
+4. Register the page in [mkdocs.yml](mkdocs.yml) under **Features**.
+5. Ensure `install.sh` is idempotent and uses `set -e` (see [CONVENTIONS.md](CONVENTIONS.md)).
+6. Add a row to the **Features** table in the root [README.md](README.md).
 
 ## Before you open a PR
 
@@ -54,6 +56,14 @@ CI also runs:
 After merge to `main`, features **publish** to GHCR ([publish.yml](.github/workflows/publish.yml)) and a **smoke test** runs ([test.yml](.github/workflows/test.yml)).
 
 Consumer docs under `docs/` deploy to GitHub Pages from `main` ([pages.yml](.github/workflows/pages.yml)). To build locally:
+
+```bash
+./scripts/invoke-mkdocs.sh build
+```
+
+That runs the same `mkdocs build --strict` as CI inside `python:3.12-slim` via Docker or Podman (no local pip required). It only writes `site/` — to **view** the docs, run `./scripts/invoke-mkdocs.sh serve` (http://localhost:8000/) or `preview` (http://localhost:8080/). See `./scripts/invoke-mkdocs.sh --help`.
+
+If you already have Python on the host:
 
 ```bash
 pip install -r docs/requirements.txt

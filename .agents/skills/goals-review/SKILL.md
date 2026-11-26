@@ -47,6 +47,8 @@ Checklist per feature:
 - [ ] `install.sh` exists, uses `set -e`, and appears idempotent
 - [ ] `version` bumped if install behaviour changed in the diff under review
 - [ ] Root README lists the feature (if the feature is public)
+- [ ] `docs/features/<feature-id>.md` exists and is listed under **Features** in [mkdocs.yml](../../mkdocs.yml)
+- [ ] `documentationURL` in metadata points at `https://markheydon.github.io/devcontainer-features/features/<feature-id>/`
 
 ## Map findings to goals
 
@@ -81,6 +83,7 @@ Checklist per feature:
 
 - [ ] UK English in changed docs
 - [ ] CONTRIBUTING and CONVENTIONS still accurate if workflows or layout changed
+- [ ] Install or option behaviour changes update `docs/features/<feature-id>.md` (consumer reference), not only `src/<feature-id>/README.md`
 
 ## Output format
 

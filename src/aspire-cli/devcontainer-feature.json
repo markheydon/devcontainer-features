@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "name": "Aspire CLI",
   "description": "User-writable Aspire CLI install via the official installer (~/.aspire), with optional bundle setup and create-time alignment to the repo Aspire SDK pin.",
-  "documentationURL": "https://github.com/markheydon/devcontainer-features/tree/main/src/aspire-cli",
+  "documentationURL": "https://markheydon.github.io/devcontainer-features/features/aspire-cli/",
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils"
   ],

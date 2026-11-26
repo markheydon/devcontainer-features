@@ -41,7 +41,7 @@ If there is no diff, say so in one sentence and stop.
 4. Metadata mistakes: `devcontainer-feature.json` `id` not matching folder, forgotten **version bump** when install behaviour changed, wrong `documentationURL` or `installsAfter`.
 5. CI gaps: ShellCheck failures, validate workflow paths, missing assertions in `test/<feature-id>/test.sh` or [feature-test.yml](../../.github/workflows/feature-test.yml) matrix for new binaries, and drift between post-publish smoke jobs in [test.yml](../../.github/workflows/test.yml) and those scripts.
 6. GHCR consumer contract: feature id or publish namespace changes that break existing `devcontainer.json` references without migration notes.
-7. Documentation drift: README or feature README not updated when behaviour changes.
+7. Documentation drift: `docs/features/<feature-id>.md` (canonical consumer reference), root README, or `src/<feature-id>/README.md` not updated when behaviour changes; wrong or missing `documentationURL`.
 
 ## Do not comment on
 

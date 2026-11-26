@@ -28,6 +28,16 @@ Use the repo helper instead of calling the CLI directly:
 
 It is what [feature-test.yml](../.github/workflows/feature-test.yml) runs per matrix job (`<feature-id> <base-image>`). With no arguments it exercises every `src/*` feature × every image in [scripts/official-base-images.txt](../scripts/official-base-images.txt) (often a superset of the CI matrix). In this dev container it falls back to running `test/<feature-id>/test.sh` inside the built image when the CLI bind mount fails.
 
+### MkDocs consumer site
+
+CI builds docs with `mkdocs build --strict` ([pages.yml](../.github/workflows/pages.yml)). On a **host** checkout with Docker or Podman, use:
+
+```bash
+./scripts/invoke-mkdocs.sh build
+```
+
+With **docker-outside-of-docker**, the host daemon often cannot bind-mount `/workspaces/...`, so this helper may fail inside the dev container even though feature tests work. Use a host-path clone, or install MkDocs with pip when Python is available.
+
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for commands to run before a PR.
 
 ### Docker-outside-of-docker vs Docker-in-Docker

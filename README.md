@@ -41,7 +41,7 @@ Pull requests welcome. Workflow, local checks, and versioning: [CONTRIBUTING.md]
 
 Maintainers use the development container in [.devcontainer/](.devcontainer/README.md) (ShellCheck, Dev Container CLI, host Docker for [scripts/test-features.sh](scripts/test-features.sh) and `devcontainer up` try-outs).
 
-Optional docs build: `pip install -r docs/requirements.txt && mkdocs build --strict`.
+Optional docs build: `./scripts/invoke-mkdocs.sh build` (Docker/Podman) or `pip install -r docs/requirements.txt && mkdocs build --strict`.
 
 ## Licence
 

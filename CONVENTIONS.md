@@ -29,7 +29,7 @@ CI workflows live under `.github/workflows/`:
 | `feature-test.yml` | On PR and `main`, `./scripts/test-features.sh` per feature × base image (matrix; subset of [scripts/official-base-images.txt](scripts/official-base-images.txt)) |
 | `test.yml` | After successful publish, `devcontainer up` and verify tools |
 
-Consumer-facing documentation lives under `docs/` (MkDocs; [GitHub Pages](https://markheydon.github.io/devcontainer-features/) via [.github/workflows/pages.yml](.github/workflows/pages.yml)). The root README links to the site; per-feature READMEs under `src/` remain install-adjacent references. Publish may still generate OCI feature documentation when `generate-docs` is enabled.
+Consumer-facing documentation lives under `docs/` (MkDocs; [GitHub Pages](https://markheydon.github.io/devcontainer-features/) via [.github/workflows/pages.yml](.github/workflows/pages.yml)). The root README links to the site. Each feature’s **canonical consumer reference** is `docs/features/<feature-id>.md` on the published site; per-feature READMEs under `src/` are install-adjacent and maintainer-oriented (testing, local paths). Publish may still generate OCI feature documentation when `generate-docs` is enabled.
 
 ---
 
@@ -38,7 +38,7 @@ Consumer-facing documentation lives under `docs/` (MkDocs; [GitHub Pages](https:
 - **`id`:** Must match the folder name under `src/` (kebab-case).
 - **`version`:** Semver. Bump on any change to install-time behaviour (packages added/removed, scripts, architecture handling).
 - **`name` / `description`:** User-facing; UK English.
-- **`documentationURL`:** Points at this repo tree path for the feature.
+- **`documentationURL`:** Points at the stable consumer page on the docs site (`https://markheydon.github.io/devcontainer-features/features/<feature-id>/`), not the `src/` tree on GitHub.
 - **`installsAfter`:** Declare ordering when another feature must run first (for example `common-utils`). Keep this in metadata even when many consumers can omit the dependency. In the feature README, state when consumers **must** add the named feature (plain or minimal bases) and when they **may omit** it (pre-built `devcontainers/*` images that already include common-utils). Do not remove `installsAfter` from JSON to “simplify” consumer configs.
 
 ---
@@ -119,7 +119,7 @@ Feature packaging and metadata validation also run in CI ([validate.yml](.github
 
 - UK English in docs and comments.
 - Keep the root README feature list in sync with folders under `src/`.
-- Per-feature README: what gets installed, why, and any caveats (architecture, `installsAfter`). Consumer `devcontainer.json` examples use GHCR major tags (`:1`), not patch semver, unless the text is about pinning.
+- Per-feature README under `src/`: short install summary, link to the docs site as canonical consumer reference, and maintainer/testing notes. Full options, examples, and caveats belong in `docs/features/<feature-id>.md`. Consumer `devcontainer.json` examples on the site use GHCR major tags (`:1`), not patch semver, unless the text is about pinning.
 
 See `.agents/skills/project-documentation/` for Diátaxis and placement guidance.
 
