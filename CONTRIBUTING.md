@@ -6,11 +6,13 @@ Pull requests welcome.
 
 1. Create a new folder under `src/<feature-id>` (kebab-case; must match feature `id` in JSON).
 2. Add:
-   - `devcontainer-feature.json`
+   - `devcontainer-feature.json` — set `documentationURL` to `https://markheydon.github.io/devcontainer-features/features/<feature-id>/`
    - `install.sh`
-   - `README.md` (recommended — packages and binaries, `installsAfter`, consumer JSON example, caveats)
-3. Ensure `install.sh` is idempotent and uses `set -e` (see [CONVENTIONS.md](CONVENTIONS.md)).
-4. Add a row to the **Features** table in the root [README.md](README.md).
+   - `README.md` (recommended — short install summary, link to the docs site, maintainer testing notes)
+3. Add `docs/features/<feature-id>.md` with the **consumer reference**: options table (or note when there are no options), `devcontainer.json` examples, lifecycle/caveats, and a source/contributing footer—not a pointer to the GitHub README for day-to-day use.
+4. Register the page in [mkdocs.yml](mkdocs.yml) under **Features**.
+5. Ensure `install.sh` is idempotent and uses `set -e` (see [CONVENTIONS.md](CONVENTIONS.md)).
+6. Add a row to the **Features** table in the root [README.md](README.md).
 
 ## Before you open a PR
 
