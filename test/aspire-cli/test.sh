@@ -18,7 +18,7 @@ aspire_user_home() {
 ASPIRE_USER_HOME="$(aspire_user_home)"
 export PATH="${ASPIRE_USER_HOME}/.aspire/bin:${PATH}"
 export ASPIRE_HOME="${ASPIRE_USER_HOME}/.aspire"
-export ASPIRE_LAYOUT_PATH="${ASPIRE_LAYOUT_PATH:-${ASPIRE_USER_HOME}/.aspire/bundle}"
+export ASPIRE_LAYOUT_PATH="${ASPIRE_LAYOUT_PATH:-${ASPIRE_USER_HOME}/.aspire}"
 
 resolve_sync_target_version() {
   if [[ -n "${ASPIRE_CLI_SYNC_TARGET_VERSION:-}" ]]; then
@@ -87,7 +87,7 @@ dev_container_user() {
 }
 
 simulate_postcreate_sync() {
-  local before user workspace aspire_bin bundle
+  local before user workspace aspire_bin layout
   if [[ ! -x "${sync_script}" ]]; then
     echo "Missing executable ${sync_script}" >&2
     return 1
@@ -112,7 +112,7 @@ simulate_postcreate_sync() {
   printf '{"sdk": {"version": "%s"}}\n' "${sync_target_version}" >"${workspace}/aspire.config.json"
 
   aspire_bin="$(command -v aspire || true)"
-  bundle="${HOME}/.aspire/bundle"
+  local layout="${HOME}/.aspire"
   if [[ -z "${aspire_bin}" ]]; then
     aspire_bin="${HOME}/.aspire/bin/aspire"
   fi
@@ -123,7 +123,7 @@ simulate_postcreate_sync() {
       cd "${workspace}"
       env PATH="$(dirname "${aspire_bin}"):${PATH}" \
         ASPIRE_HOME="${HOME}/.aspire" \
-        ASPIRE_LAYOUT_PATH="${bundle}" \
+        ASPIRE_LAYOUT_PATH="${layout}" \
         "${sync_script}"
     )
   elif [[ "$(id -u)" -eq 0 ]]; then
@@ -137,7 +137,7 @@ simulate_postcreate_sync() {
     sudo -u "${user}" -H env \
       PATH="${user_home}/.aspire/bin:${PATH}" \
       ASPIRE_HOME="${user_home}/.aspire" \
-      ASPIRE_LAYOUT_PATH="${user_home}/.aspire/bundle" \
+      ASPIRE_LAYOUT_PATH="${user_home}/.aspire" \
       HOME="${user_home}" \
       bash -c "cd '${workspace}' && '${sync_script}'"
   else
@@ -181,14 +181,41 @@ check_aspire_under_home() {
   esac
 }
 
+aspire_cli_major_version() {
+  local version
+  version="$(installed_aspire_version || true)"
+  if [[ -z "${version}" ]]; then
+    return 1
+  fi
+  printf '%s' "${version%%.*}"
+}
+
+check_bundle_symlink_for_aspire_17() {
+  local major bundle
+  major="$(aspire_cli_major_version || true)"
+  if [[ -z "${major}" ]] || [[ "${major}" -lt 17 ]]; then
+    return 0
+  fi
+  bundle="${ASPIRE_USER_HOME}/.aspire/bundle"
+  if [[ ! -L "${bundle}" ]]; then
+    if [[ -d "${bundle}" ]]; then
+      echo "Expected ${bundle} to be a symlink for Aspire 17+, got a directory" >&2
+    else
+      echo "Expected ${bundle} symlink for Aspire 17+, not found" >&2
+    fi
+    return 1
+  fi
+}
+
 check "sync script" test -x "${sync_script}"
 check "aspire on PATH" command -v aspire
 check "aspire not under /usr/local/bin" check_aspire_not_system_local
 check "aspire under user home" check_aspire_under_home
 check "aspire --version" aspire --version
+check "bundle symlink (Aspire 17+)" check_bundle_symlink_for_aspire_17
 
-bundle="${ASPIRE_LAYOUT_PATH:-${HOME}/.aspire/bundle}"
-check "aspire setup" env ASPIRE_LAYOUT_PATH="${bundle}" aspire setup --non-interactive --install-path "${bundle}"
+layout="${ASPIRE_LAYOUT_PATH:-${ASPIRE_USER_HOME}/.aspire}"
+check "aspire setup" env ASPIRE_LAYOUT_PATH="${layout}" aspire setup --non-interactive
 
 if [[ "${ASPIRE_CLI_SYNC_VERIFY_ONLY:-0}" == "1" ]]; then
   if [[ ! -f aspire.config.json ]]; then

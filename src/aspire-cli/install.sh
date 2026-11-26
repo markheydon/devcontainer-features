@@ -76,13 +76,24 @@ run_as_user() {
     return 1
 }
 
-resolve_bundle_path() {
+resolve_layout_path() {
     local home="$1"
     if [[ -n "${BUNDLEPATH}" ]]; then
         printf '%s' "${BUNDLEPATH}"
         return 0
     fi
-    printf '%s' "${home}/.aspire/bundle"
+    printf '%s' "${home}/.aspire"
+}
+
+clear_legacy_bundle_directory() {
+    local home="$1"
+    local bundle="${home}/.aspire/bundle"
+    local versions="${home}/.aspire/versions"
+    if [[ -e "${bundle}" && ! -L "${bundle}" && -d "${bundle}" ]]; then
+        if [[ -d "${versions}" ]] && compgen -G "${versions}/*" >/dev/null; then
+            rm -rf "${bundle}"
+        fi
+    fi
 }
 
 normalize_aspire_version() {
@@ -165,13 +176,13 @@ install_cli_for_user() {
 run_setup_for_user() {
     local user="$1"
     local home="$2"
-    local bundle
-    bundle="$(resolve_bundle_path "${home}")"
+    local layout
+    layout="$(resolve_layout_path "${home}")"
     local aspire_bin="${home}/.aspire/bin/aspire"
 
-    mkdir -p "${bundle}"
+    mkdir -p "${layout}"
     if [[ "${user}" != "root" ]]; then
-        chown -R "${user}:${user}" "${bundle}" "${home}/.aspire" 2>/dev/null || true
+        chown -R "${user}:${user}" "${home}/.aspire" 2>/dev/null || true
     fi
 
     case "${RUNSETUPONINSTALL}" in
@@ -186,12 +197,14 @@ run_setup_for_user() {
         return 0
     fi
 
+    clear_legacy_bundle_directory "${home}"
+
     run_as_user "${user}" env \
         HOME="${home}" \
         PATH="${home}/.aspire/bin:${PATH}" \
         ASPIRE_HOME="${home}/.aspire" \
-        ASPIRE_LAYOUT_PATH="${bundle}" \
-        "${aspire_bin}" setup --non-interactive --install-path "${bundle}"
+        ASPIRE_LAYOUT_PATH="${layout}" \
+        "${aspire_bin}" setup --non-interactive
 }
 
 write_system_profile() {
@@ -200,7 +213,7 @@ write_system_profile() {
 if [ -n "${HOME:-}" ] && [ -d "${HOME}/.aspire/bin" ]; then
   export ASPIRE_HOME="${HOME}/.aspire"
   if [ -z "${ASPIRE_LAYOUT_PATH:-}" ]; then
-    export ASPIRE_LAYOUT_PATH="${HOME}/.aspire/bundle"
+    export ASPIRE_LAYOUT_PATH="${HOME}/.aspire"
   fi
   export PATH="${HOME}/.aspire/bin:${PATH}"
 fi
@@ -210,11 +223,11 @@ EOF
 
 append_user_shell_snippet() {
     local home="$1"
-    local bundle="$2"
+    local layout="$2"
     local snippet
     snippet="${PROFILE_SNIPPET_MARKER}
 export ASPIRE_HOME=\"\${HOME}/.aspire\"
-export ASPIRE_LAYOUT_PATH=\"${bundle}\"
+export ASPIRE_LAYOUT_PATH=\"${layout}\"
 export PATH=\"\${HOME}/.aspire/bin:\${PATH}\""
 
     for rc in "${home}/.bashrc" "${home}/.profile"; do
@@ -237,10 +250,29 @@ set -euo pipefail
 ASPIRE_IMAGE_VERSION="${ASPIRE_CLI_VERSION}"
 QUALITY="${QUALITY}"
 RUNSETUPONINSTALL="${RUNSETUPONINSTALL}"
+BUNDLEPATH="${BUNDLEPATH}"
 INSTALLER_URL="${INSTALLER_URL}"
 EOF
 
     tee -a "${SYNC_ASPIRE_VERSION_SCRIPT}" >/dev/null <<'EOF'
+
+resolve_layout_path() {
+    if [[ -n "${BUNDLEPATH}" ]]; then
+        printf '%s' "${BUNDLEPATH}"
+        return 0
+    fi
+    printf '%s' "${HOME}/.aspire"
+}
+
+clear_legacy_bundle_directory() {
+    local bundle="${HOME}/.aspire/bundle"
+    local versions="${HOME}/.aspire/versions"
+    if [[ -e "${bundle}" && ! -L "${bundle}" && -d "${bundle}" ]]; then
+        if [[ -d "${versions}" ]] && compgen -G "${versions}/*" >/dev/null; then
+            rm -rf "${bundle}"
+        fi
+    fi
+}
 
 normalize_aspire_version() {
     local v="$1"
@@ -342,18 +374,23 @@ PY
 }
 
 run_setup_if_enabled() {
-    local bundle="${ASPIRE_LAYOUT_PATH:-${HOME}/.aspire/bundle}"
+    local layout
+    layout="$(resolve_layout_path)"
+    if [[ -n "${ASPIRE_LAYOUT_PATH:-}" ]]; then
+        layout="${ASPIRE_LAYOUT_PATH}"
+    fi
     local aspire_bin="${HOME}/.aspire/bin/aspire"
     case "${RUNSETUPONINSTALL}" in
         true | 1 | yes) ;;
         *) return 0 ;;
     esac
-    mkdir -p "${bundle}"
+    mkdir -p "${layout}"
     if [[ ! -x "${aspire_bin}" ]]; then
         return 0
     fi
-    env PATH="${HOME}/.aspire/bin:${PATH}" ASPIRE_HOME="${HOME}/.aspire" ASPIRE_LAYOUT_PATH="${bundle}" \
-        "${aspire_bin}" setup --non-interactive --install-path "${bundle}"
+    clear_legacy_bundle_directory
+    env PATH="${HOME}/.aspire/bin:${PATH}" ASPIRE_HOME="${HOME}/.aspire" ASPIRE_LAYOUT_PATH="${layout}" \
+        "${aspire_bin}" setup --non-interactive
 }
 
 reinstall_cli_version() {
@@ -403,10 +440,10 @@ if user="$(container_user_name)"; then
     user_home="$(remote_user_home)"
 fi
 
-bundle_path="$(resolve_bundle_path "${user_home}")"
+layout_path="$(resolve_layout_path "${user_home}")"
 install_cli_for_user "${target_user}" "${user_home}"
 run_setup_for_user "${target_user}" "${user_home}"
-append_user_shell_snippet "${user_home}" "${bundle_path}"
+append_user_shell_snippet "${user_home}" "${layout_path}"
 
 if [[ "${target_user}" != "root" ]]; then
     chown "${target_user}:${target_user}" "${user_home}/.bashrc" "${user_home}/.profile" 2>/dev/null || true

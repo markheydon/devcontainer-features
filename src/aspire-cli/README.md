@@ -11,7 +11,7 @@ This feature does **not** install a .NET SDK. Use `mcr.microsoft.com/devcontaine
 | Component | How |
 |-----------|-----|
 | **Aspire CLI** | Official `https://aspire.dev/install.sh` → `~/.aspire/bin/aspire` |
-| **Bundle layout** | Optional `aspire setup --non-interactive` into `ASPIRE_LAYOUT_PATH` (default `~/.aspire/bundle`) |
+| **Bundle layout** | Optional `aspire setup --non-interactive` with layout root `ASPIRE_LAYOUT_PATH` (default `~/.aspire`; Aspire 17+ creates `bundle/` as a symlink there) |
 | **Shell PATH** | `/etc/profile.d/aspire-cli.sh` and a marked block in the user’s `.bashrc` / `.profile` |
 
 `apt`: `ca-certificates`, `curl`, `python3-minimal` (installer download and create-time SDK pin detection).
@@ -55,7 +55,7 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 |--------|---------|-------------|
 | `aspireVersion` | `latest` | Aspire CLI version for the installer, or `latest` for the selected `quality` at image build with repo alignment on create when an SDK pin is found. |
 | `quality` | `release` | Installer channel when `aspireVersion` is `latest` (`release`, `staging`, `dev`). Ignored when `aspireVersion` is pinned. |
-| `bundlePath` | *(empty)* | Directory for `aspire setup`. Empty uses `$HOME/.aspire/bundle` for the container user. |
+| `bundlePath` | *(empty)* | Aspire layout root for setup and `ASPIRE_LAYOUT_PATH`. Empty uses `$HOME/.aspire` for the container user. |
 | `runSetupOnInstall` | `true` | Run `aspire setup --non-interactive` after install or CLI sync. |
 
 ## Container environment
@@ -68,7 +68,7 @@ For **Aspire VS Code extension**, tasks, or other processes that do not run a lo
 "remoteEnv": {
   "PATH": "${containerEnv:HOME}/.aspire/bin:${containerEnv:PATH}",
   "ASPIRE_HOME": "${containerEnv:HOME}/.aspire",
-  "ASPIRE_LAYOUT_PATH": "${containerEnv:HOME}/.aspire/bundle"
+  "ASPIRE_LAYOUT_PATH": "${containerEnv:HOME}/.aspire"
 }
 ```
 
@@ -88,11 +88,11 @@ The official installer script is fetched from `https://aspire.dev/install.sh` wi
 
 ## Contrast with Microsoft’s Aspire feature
 
-`ghcr.io/microsoft/aspire-devcontainer-feature/aspire` installs the CLI for a system-wide layout under `/usr/local`. For Docker-in-Docker and AppHost workflows as a non-root user, bundle extraction under paths the user cannot write reliably is a known pain point. This feature follows the [official installer](https://aspire.dev/install.sh) layout under `~/.aspire` instead.
+`ghcr.io/microsoft/aspire-devcontainer-feature/aspire` installs the CLI for a system-wide layout under `/usr/local`, copies `aspire` to `/usr/local/bin` for non-login shells, and does not run `aspire setup` at image build. For Docker-in-Docker and AppHost workflows as a non-root user, bundle extraction under paths the user cannot write reliably is a known pain point. This feature follows the [official installer](https://aspire.dev/install.sh) layout under `~/.aspire` instead and runs optional bundle setup with the correct layout root for Aspire 17+.
 
 ## Testing
 
-CI runs `test/aspire-cli/test.sh`, which asserts the CLI location, `aspire setup`, and simulates `postCreate` sync against a fixture `sdk.version`. The pin lives in `test/aspire-cli/sync-target-version.txt` (override with `ASPIRE_CLI_SYNC_TARGET_VERSION`). Post-publish smoke writes the same pin into `aspire.config.json` and uses `ASPIRE_CLI_SYNC_VERIFY_ONLY=1` after `devcontainer up`.
+CI runs `test/aspire-cli/test.sh`, which asserts the CLI location, `aspire setup`, a `~/.aspire/bundle` symlink when the CLI is Aspire 17+, and simulates `postCreate` sync against a fixture `sdk.version`. The pin lives in `test/aspire-cli/sync-target-version.txt` (override with `ASPIRE_CLI_SYNC_TARGET_VERSION`). Post-publish smoke writes the same pin into `aspire.config.json` and uses `ASPIRE_CLI_SYNC_VERIFY_ONLY=1` after `devcontainer up`.
 
 **If sync tests fail** because release `latest` equals the pin or the pin is unavailable from the installer: choose an older version still published on the Aspire download feeds (for example below current release `17.0.0`) and update `test/aspire-cli/sync-target-version.txt`.
 
