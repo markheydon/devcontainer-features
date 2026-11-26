@@ -58,6 +58,14 @@ After merge to `main`, features **publish** to GHCR ([publish.yml](.github/workf
 Consumer docs under `docs/` deploy to GitHub Pages from `main` ([pages.yml](.github/workflows/pages.yml)). To build locally:
 
 ```bash
+./scripts/invoke-mkdocs.sh build
+```
+
+That runs the same `mkdocs build --strict` as CI inside `python:3.12-slim` via Docker or Podman (no local pip required). It only writes `site/` — to **view** the docs, run `./scripts/invoke-mkdocs.sh serve` (http://localhost:8000/) or `preview` (http://localhost:8080/). See `./scripts/invoke-mkdocs.sh --help`.
+
+If you already have Python on the host:
+
+```bash
 pip install -r docs/requirements.txt
 mkdocs build --strict
 ```

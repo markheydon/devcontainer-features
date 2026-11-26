@@ -1,0 +1,7 @@
+# MkDocs build output (CI and invoke-mkdocs.sh write here; not committed)
+/site/
+
+# Local Python tooling for MkDocs (optional host install)
+.venv/
+__pycache__/
+*.py[cod]
