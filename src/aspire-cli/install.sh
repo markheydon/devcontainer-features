@@ -92,6 +92,10 @@ clear_legacy_bundle_directory() {
     if [[ -e "${bundle}" && ! -L "${bundle}" && -d "${bundle}" ]]; then
         if [[ -d "${versions}" ]] && compgen -G "${versions}/*" >/dev/null; then
             rm -rf "${bundle}"
+            return 0
+        fi
+        if [[ -z "$(ls -A "${bundle}" 2>/dev/null || true)" ]]; then
+            rm -rf "${bundle}"
         fi
     fi
 }
@@ -212,13 +216,28 @@ write_system_profile() {
 # aspire-cli devcontainer feature
 if [ -n "${HOME:-}" ] && [ -d "${HOME}/.aspire/bin" ]; then
   export ASPIRE_HOME="${HOME}/.aspire"
-  if [ -z "${ASPIRE_LAYOUT_PATH:-}" ]; then
+  if [ -z "${ASPIRE_LAYOUT_PATH:-}" ] || [ "${ASPIRE_LAYOUT_PATH}" = "${HOME}/.aspire/bundle" ]; then
     export ASPIRE_LAYOUT_PATH="${HOME}/.aspire"
   fi
   export PATH="${HOME}/.aspire/bin:${PATH}"
 fi
 EOF
     chmod 644 /etc/profile.d/aspire-cli.sh
+}
+
+remove_old_aspire_cli_snippet() {
+    local rc="$1"
+    local tmp
+    tmp="$(mktemp)"
+    awk -v marker="${PROFILE_SNIPPET_MARKER}" '
+        $0 == marker { inblock=1; next }
+        inblock && /^export ASPIRE_HOME=/ { next }
+        inblock && /^export ASPIRE_LAYOUT_PATH=/ { next }
+        inblock && /^export PATH=.*\.aspire\/bin:/ { inblock=0; next }
+        inblock { next }
+        { print }
+    ' "${rc}" >"${tmp}"
+    mv "${tmp}" "${rc}"
 }
 
 append_user_shell_snippet() {
@@ -234,9 +253,10 @@ export PATH=\"\${HOME}/.aspire/bin:\${PATH}\""
         if [[ ! -f "${rc}" ]]; then
             touch "${rc}"
         fi
-        if ! grep -Fq "${PROFILE_SNIPPET_MARKER}" "${rc}"; then
-            printf '\n%s\n' "${snippet}" >>"${rc}"
+        if grep -Fq "${PROFILE_SNIPPET_MARKER}" "${rc}"; then
+            remove_old_aspire_cli_snippet "${rc}"
         fi
+        printf '\n%s\n' "${snippet}" >>"${rc}"
     done
 }
 
@@ -270,8 +290,26 @@ clear_legacy_bundle_directory() {
     if [[ -e "${bundle}" && ! -L "${bundle}" && -d "${bundle}" ]]; then
         if [[ -d "${versions}" ]] && compgen -G "${versions}/*" >/dev/null; then
             rm -rf "${bundle}"
+            return 0
+        fi
+        if [[ -z "$(ls -A "${bundle}" 2>/dev/null || true)" ]]; then
+            rm -rf "${bundle}"
         fi
     fi
+}
+
+resolve_effective_layout_path() {
+    local layout
+    layout="$(resolve_layout_path)"
+    if [[ -n "${BUNDLEPATH}" ]]; then
+        printf '%s' "${layout}"
+        return 0
+    fi
+    if [[ -n "${ASPIRE_LAYOUT_PATH:-}" ]] \
+        && [[ "${ASPIRE_LAYOUT_PATH}" != "${HOME}/.aspire/bundle" ]]; then
+        layout="${ASPIRE_LAYOUT_PATH}"
+    fi
+    printf '%s' "${layout}"
 }
 
 normalize_aspire_version() {
@@ -375,10 +413,7 @@ PY
 
 run_setup_if_enabled() {
     local layout
-    layout="$(resolve_layout_path)"
-    if [[ -n "${ASPIRE_LAYOUT_PATH:-}" ]]; then
-        layout="${ASPIRE_LAYOUT_PATH}"
-    fi
+    layout="$(resolve_effective_layout_path)"
     local aspire_bin="${HOME}/.aspire/bin/aspire"
     case "${RUNSETUPONINSTALL}" in
         true | 1 | yes) ;;

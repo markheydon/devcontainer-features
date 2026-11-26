@@ -246,6 +246,7 @@ check_aspire_run_bundle_smoke() {
   # shellcheck disable=SC2064
   trap 'rm -rf "${fixture_dir:-}" "${logfile:-}"' RETURN
   write_run_smoke_fixture "${fixture_dir}"
+  local run_status=0
   set +e
   (
     cd "${fixture_dir}"
@@ -255,7 +256,13 @@ check_aspire_run_bundle_smoke() {
       ASPIRE_LAYOUT_PATH="${ASPIRE_LAYOUT_PATH}" \
       aspire run
   ) >"${logfile}" 2>&1
+  run_status=$?
   set -e
+  if [[ "${run_status}" -ne 0 && "${run_status}" -ne 124 ]]; then
+    echo "aspire run exited with status ${run_status}:" >&2
+    cat "${logfile}" >&2
+    return 1
+  fi
   if grep -qiE 'Bundle extraction failed|layout validation failed|Failed to rename legacy directory' "${logfile}"; then
     echo "aspire run hit a bundle layout failure:" >&2
     cat "${logfile}" >&2
