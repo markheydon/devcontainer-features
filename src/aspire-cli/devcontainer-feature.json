@@ -1,6 +1,6 @@
 {
   "id": "aspire-cli",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "name": "Aspire CLI",
   "description": "User-writable Aspire CLI install via the official installer (~/.aspire), with optional bundle setup and create-time alignment to the repo Aspire SDK pin.",
   "documentationURL": "https://github.com/markheydon/devcontainer-features/tree/main/src/aspire-cli",
@@ -22,7 +22,7 @@
     "bundlePath": {
       "type": "string",
       "default": "",
-      "description": "Directory for aspire setup bundle extraction. Empty uses $HOME/.aspire/bundle under the container user."
+      "description": "Aspire layout root for ASPIRE_LAYOUT_PATH and aspire setup. Empty uses $HOME/.aspire under the container user (Aspire 17+ creates bundle/ as a symlink there)."
     },
     "runSetupOnInstall": {
       "type": "boolean",
