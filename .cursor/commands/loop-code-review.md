@@ -14,7 +14,7 @@ Repeat this cycle until the review is clear of actionable findings:
 
    Optional when Docker is available: `./scripts/test-features.sh <feature-id>` (full matrix: `./scripts/test-features.sh`) — see [.devcontainer/README.md](../../.devcontainer/README.md). CI runs [feature-test.yml](../../.github/workflows/feature-test.yml) and [validate.yml](../../.github/workflows/validate.yml). Fix any ShellCheck failures before the next loop.
 
-4. **Commit** — When a loop produced code changes, create a commit with a message that reflects the review fixes (invoking this command counts as explicit permission to commit).
+4. **Commit** — When a loop produced code changes, create a **signed** commit with a message that reflects the review fixes (invoking this command counts as explicit permission to commit). Follow [AGENTS.md](../../AGENTS.md#git-commits): do not use `--no-gpg-sign` or `--no-verify` to bypass signing or hooks.
 
 Start the next loop only after steps 2–4 are done (or step 1 returned no significant issues).
 

@@ -14,6 +14,10 @@ Pull requests welcome.
 5. Ensure `install.sh` is idempotent and uses `set -e` (see [CONVENTIONS.md](CONVENTIONS.md)).
 6. Add a row to the **Features** table in the root [README.md](README.md).
 
+## Git commits
+
+The default branch requires **signed commits** (GitHub ruleset). Use your usual GPG or SSH commit signing for every commit you intend to merge; unsigned commits will be rejected on merge.
+
 ## Before you open a PR
 
 From the [development container](.devcontainer/README.md) (rebuild after feature changes there):
