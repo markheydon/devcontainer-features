@@ -103,6 +103,8 @@ Earlier releases defaulted the layout path to `~/.aspire/bundle`. **Aspire 17+**
 
 With `aspireVersion: latest` (the default), `postCreateCommand` runs `/usr/local/share/aspire-cli/sync-aspire-version.sh`. When the workspace contains a single Aspire SDK pin (for example `aspire.config.json` → `sdk.version`, or `Aspire.Hosting.AppHost` / `Aspire.AppHost.Sdk` in project files) and the installed CLI differs, the script reinstalls that CLI version and re-runs setup when enabled. Sync only runs when `aspireVersion` was `latest` at image build. Multiple conflicting SDK pins or a missing `python3` at create time fail the sync step instead of succeeding silently.
 
+Post-publish CI includes a **workflow** smoke job that builds a dev container against a minimal Aspire app workspace and runs `aspire run` from the project root via a login shell (described in the feature README under Testing).
+
 The official installer script is fetched from `https://aspire.dev/install.sh` without a checksum pin (Aspire does not publish a stable checksum for that URL). Pin `aspireVersion` when you need reproducible installs or stricter supply-chain control.
 
 **Certificate trust:** this feature does not run `aspire certs trust`. Add a consumer `postStartCommand` when you need dev HTTPS trust, for example:

@@ -108,6 +108,7 @@ run_assertions() {
     local aspire_pin
     aspire_pin="$(tr -d '[:space:]' < "${REPO_ROOT}/test/aspire-cli/sync-target-version.txt")"
     docker_env=(-e "ASPIRE_CLI_SYNC_TARGET_VERSION=${aspire_pin}")
+    # AppHost workflow smoke uses fixtures/run-smoke in test.yml (post-publish), not here.
   fi
 
   if [[ "${VERBOSE}" == "1" ]]; then
