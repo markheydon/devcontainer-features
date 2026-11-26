@@ -2,7 +2,7 @@
 
 **Project:** markheydon/devcontainer-features  
 **Owner:** Mark Heydon  
-**Last updated:** 2026-11-11
+**Last updated:** 2026-11-26
 
 ---
 
@@ -24,7 +24,7 @@ Developers need small, opinionated Dev Container features that complement offici
 ## Success Looks Like
 
 - New features follow the `src/<id>/` layout and pass validate, ShellCheck, feature tests ([feature-test.yml](.github/workflows/feature-test.yml)), publish, and post-publish smoke test.
-- Root README and per-feature READMEs list what is installed, consumer references (including `installsAfter`), and caveats.
+- Root README orients contributors and links to the [MkDocs consumer site](https://markheydon.github.io/devcontainer-features/). Each feature’s canonical consumer reference is `docs/features/<feature-id>.md` (options, `devcontainer.json` examples, `installsAfter`, and caveats); `src/<feature-id>/README.md` stays install-adjacent with maintainer testing notes.
 - Consumers can pin versions or use `latest` without surprise breaking changes undocumented in release notes or version bumps.
 
 ---
@@ -60,3 +60,4 @@ Do not implement without an explicit scope change.
 | Date | Change | Reason |
 |---|---|---|
 | 2026-11-11 | Initial goals for devcontainer-features | Lean governance setup |
+| 2026-11-26 | Success criteria: MkDocs `docs/features/` as canonical consumer reference | Consumer docs split from `src/` READMEs (#27) |
