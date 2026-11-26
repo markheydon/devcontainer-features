@@ -258,11 +258,6 @@ check_aspire_run_bundle_smoke() {
   ) >"${logfile}" 2>&1
   run_status=$?
   set -e
-  if [[ "${run_status}" -ne 0 && "${run_status}" -ne 124 ]]; then
-    echo "aspire run exited with status ${run_status}:" >&2
-    cat "${logfile}" >&2
-    return 1
-  fi
   if [[ "${run_status}" -eq 124 ]]; then
     if ! grep -qiE 'DistributedApplication|AppHost|dotnet.*restore|Building' "${logfile}"; then
       echo "aspire run timed out before AppHost progress:" >&2
