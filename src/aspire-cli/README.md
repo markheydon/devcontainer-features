@@ -70,7 +70,7 @@ Metadata sets `installsAfter` [common-utils](https://github.com/devcontainers/fe
 |--------|---------|-------------|
 | `aspireVersion` | `latest` | Aspire CLI version for the installer, or `latest` for the selected `quality` at image build with repo alignment on create when an SDK pin is found. |
 | `quality` | `release` | Installer channel when `aspireVersion` is `latest` (`release`, `staging`, `dev`). Ignored when `aspireVersion` is pinned. |
-| `bundlePath` | *(empty)* | Aspire layout root for setup and `ASPIRE_LAYOUT_PATH`. Empty uses `$HOME/.aspire` for the container user. **Migration:** if you previously set this to `…/.aspire/bundle`, point it at the layout root (`…/.aspire`) instead—Aspire 17+ keeps `bundle/` as a symlink under that root. Rebuild the dev container after upgrading so install rewrites shell snippets and `remoteEnv`. On a persisted home volume, remove a non-symlink `~/.aspire/bundle` directory manually if setup still reports legacy layout errors. |
+| `bundlePath` | *(empty)* | Aspire layout root for setup and `ASPIRE_LAYOUT_PATH`. Empty uses `$HOME/.aspire` for the container user. See [Upgrading from earlier `aspire-cli` versions](#upgrading-from-earlier-aspire-cli-versions) if you previously used `…/.aspire/bundle` here. |
 | `runSetupOnInstall` | `true` | Run `aspire setup --non-interactive` after install or CLI sync. |
 
 ## Container environment
@@ -89,6 +89,16 @@ For **Aspire VS Code extension**, tasks, or other processes that do not run a lo
 
 You can omit `remoteEnv` when you only use `aspire` from a login or interactive bash terminal (see above).
 
+On each feature install, `/etc/profile.d/aspire-cli.sh` treats a stale `ASPIRE_LAYOUT_PATH` of `~/.aspire/bundle` as the layout root `~/.aspire`, and reinstall replaces the marked block in the user’s `.bashrc` / `.profile` so a rebuild picks up the correct value even when `remoteEnv` in `devcontainer.json` is unchanged.
+
+## Upgrading from earlier `aspire-cli` versions
+
+Earlier releases defaulted the layout path to `~/.aspire/bundle`. **Aspire 17+** expects the layout root at `~/.aspire`, with `bundle/` created as a symlink there ([bundle spec](https://github.com/microsoft/aspire/blob/main/docs/specs/bundle.md)).
+
+1. Set **`bundlePath`** (if used) and **`remoteEnv.ASPIRE_LAYOUT_PATH`** to the layout root (`…/.aspire`), not `…/.aspire/bundle`.
+2. **Rebuild** the dev container so install rewrites shell snippets and refreshes `/etc/profile.d/aspire-cli.sh`.
+3. With a **persisted home volume**, remove a non-symlink `~/.aspire/bundle` directory if setup still reports legacy layout errors. Install removes an empty legacy directory—or one left after versions exist under `~/.aspire/versions`—before `aspire setup` when `runSetupOnInstall` is enabled.
+
 ## After the container builds
 
 With `aspireVersion: latest` (the default), `postCreateCommand` runs `/usr/local/share/aspire-cli/sync-aspire-version.sh`. When the workspace contains a single Aspire SDK pin (for example `aspire.config.json` → `sdk.version`, or `Aspire.Hosting.AppHost` / `Aspire.AppHost.Sdk` in project files) and the installed CLI differs, the script reinstalls that CLI version and re-runs setup when enabled. Sync only runs when `aspireVersion` was `latest` at image build. Multiple conflicting SDK pins or a missing `python3` at create time fail the sync step instead of succeeding silently.
@@ -100,10 +110,6 @@ The official installer script is fetched from `https://aspire.dev/install.sh` wi
 ```json
 "postStartCommand": "aspire certs trust --non-interactive"
 ```
-
-## Contrast with Microsoft’s Aspire feature
-
-`ghcr.io/microsoft/aspire-devcontainer-feature/aspire` installs the CLI for a system-wide layout under `/usr/local`, copies `aspire` to `/usr/local/bin` for non-login shells, and does not run `aspire setup` at image build. For Docker-in-Docker and AppHost workflows as a non-root user, bundle extraction under paths the user cannot write reliably is a known pain point. This feature follows the [official installer](https://aspire.dev/install.sh) layout under `~/.aspire` instead and runs optional bundle setup with the correct layout root for Aspire 17+.
 
 ## Testing
 

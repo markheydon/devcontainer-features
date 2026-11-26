@@ -29,7 +29,7 @@ See [Getting started](guides/getting-started.md) for a fuller walkthrough.
 |---------|---------|
 | [Dev Agent Tools](features/dev-agent-tools.md) | CLI tools and shell defaults for agent-assisted development |
 | [Spec Kit](features/spec-kit.md) | uv, Python when needed, and the Specify CLI for GitHub Spec Kit |
-| [Aspire CLI](features/aspire-cli.md) | User-scoped Aspire CLI via the official installer, with optional repo SDK sync on create |
+| [Aspire CLI](features/aspire-cli.md) | User-scoped Aspire CLI via the official installer, optional bundle setup, and repo SDK sync on create |
 
 ## Repository
 
