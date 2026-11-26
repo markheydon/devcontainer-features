@@ -6,6 +6,21 @@ Unlike `ghcr.io/microsoft/aspire-devcontainer-feature/aspire`, this feature does
 
 This feature does **not** install a .NET SDK. Use `mcr.microsoft.com/devcontainers/dotnet` or the official `dotnet` feature when you need the SDK.
 
+## Why not Microsoft’s `aspire` feature?
+
+Consumers often ask why this repository publishes **`aspire-cli`** instead of [`ghcr.io/microsoft/aspire-devcontainer-feature/aspire`](https://github.com/microsoft/aspire-devcontainer-feature). Both install the same upstream CLI from [aspire.dev/install.sh](https://aspire.dev/install.sh); the difference is **layout, user identity, and lifecycle**.
+
+| Topic | Microsoft `aspire` feature | This `aspire-cli` feature |
+|--------|----------------------------|---------------------------|
+| **CLI on PATH** | Copies `aspire` to **`/usr/local/bin`** (installer runs as root during feature install) | Installs under the **container user’s** `~/.aspire/bin` |
+| **Bundle setup** | Does **not** run `aspire setup` at image build | Optional **`aspire setup --non-interactive`** at install and after SDK sync |
+| **VS Code / tasks** | Often works without extra `remoteEnv` because of `/usr/local/bin` | Use **`remoteEnv`** or login shells so non-interactive tools see `~/.aspire/bin` |
+| **SDK pin alignment** | None | **`sync-aspire-version.sh`** on create when `aspireVersion: latest` and the repo has a single Aspire SDK pin |
+
+**When Microsoft’s feature is enough:** you only need the CLI on PATH, you are fine with `/usr/local`, and you do not need eager bundle setup or create-time CLI/SDK alignment.
+
+**Why we added `aspire-cli`:** validated on [Potsure](https://github.com/markheydon/potsure) with `mcr.microsoft.com/devcontainers/dotnet`, Docker-in-Docker, and AppHost workflows as non-root **`vscode`**. With Microsoft’s feature, `aspire` resolved to **`/usr/local/bin/aspire`** and bundle/setup work under **`/usr/local`** or root-owned paths was unreliable for a user-writable layout. A home-directory install plus explicit setup matches [Aspire’s bundle layout](https://github.com/microsoft/aspire/blob/main/docs/specs/bundle.md) for non-root dev containers. Background: [devcontainer-features#24](https://github.com/markheydon/devcontainer-features/issues/24).
+
 ## What gets installed
 
 | Component | How |
@@ -92,7 +107,7 @@ The official installer script is fetched from `https://aspire.dev/install.sh` wi
 
 ## Testing
 
-CI runs `test/aspire-cli/test.sh`, which asserts the CLI location, `aspire setup`, a `~/.aspire/bundle` symlink when the CLI is Aspire 17+, and simulates `postCreate` sync against a fixture `sdk.version`. The pin lives in `test/aspire-cli/sync-target-version.txt` (override with `ASPIRE_CLI_SYNC_TARGET_VERSION`). Post-publish smoke writes the same pin into `aspire.config.json` and uses `ASPIRE_CLI_SYNC_VERIFY_ONLY=1` after `devcontainer up`.
+CI runs `test/aspire-cli/test.sh`, which asserts the CLI location, `aspire setup`, a `~/.aspire/bundle` symlink when the CLI is Aspire 17+, an **`aspire run`** bundle smoke (minimal AppHost; sources under `test/aspire-cli/fixtures/run-smoke/`, materialised in `test.sh` on images with the .NET SDK), and simulates `postCreate` sync against a fixture `sdk.version`. The pin lives in `test/aspire-cli/sync-target-version.txt` (override with `ASPIRE_CLI_SYNC_TARGET_VERSION`). Post-publish smoke writes the same pin into `aspire.config.json` and uses `ASPIRE_CLI_SYNC_VERIFY_ONLY=1` after `devcontainer up`.
 
 **If sync tests fail** because release `latest` equals the pin or the pin is unavailable from the installer: choose an older version still published on the Aspire download feeds (for example below current release `17.0.0`) and update `test/aspire-cli/sync-target-version.txt`.
 

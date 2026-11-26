@@ -87,7 +87,7 @@ dev_container_user() {
 }
 
 simulate_postcreate_sync() {
-  local before user workspace aspire_bin layout
+  local before user workspace aspire_bin layout home_layout
   if [[ ! -x "${sync_script}" ]]; then
     echo "Missing executable ${sync_script}" >&2
     return 1
@@ -112,7 +112,7 @@ simulate_postcreate_sync() {
   printf '{"sdk": {"version": "%s"}}\n' "${sync_target_version}" >"${workspace}/aspire.config.json"
 
   aspire_bin="$(command -v aspire || true)"
-  local layout="${HOME}/.aspire"
+  home_layout="${HOME}/.aspire"
   if [[ -z "${aspire_bin}" ]]; then
     aspire_bin="${HOME}/.aspire/bin/aspire"
   fi
@@ -123,7 +123,7 @@ simulate_postcreate_sync() {
       cd "${workspace}"
       env PATH="$(dirname "${aspire_bin}"):${PATH}" \
         ASPIRE_HOME="${HOME}/.aspire" \
-        ASPIRE_LAYOUT_PATH="${layout}" \
+        ASPIRE_LAYOUT_PATH="${home_layout}" \
         "${sync_script}"
     )
   elif [[ "$(id -u)" -eq 0 ]]; then
@@ -207,6 +207,71 @@ check_bundle_symlink_for_aspire_17() {
   fi
 }
 
+# Mirror of test/aspire-cli/fixtures/run-smoke/ (same tree on disk for review; this hook
+# materialises it because feature tests are often piped into bash -c without the repo mount).
+write_run_smoke_fixture() {
+  local dest="$1"
+  mkdir -p "${dest}/AppHost"
+  cat >"${dest}/aspire.config.json" <<'JSON'
+{
+  "appHost": {
+    "path": "AppHost/Program.cs",
+    "language": "csharp"
+  },
+  "sdk": {
+    "version": "17.0.0"
+  }
+}
+JSON
+  cat >"${dest}/AppHost/Program.cs" <<'CS'
+#:package Aspire.Hosting.AppHost@17.0.0
+
+var builder = DistributedApplication.CreateBuilder(args);
+builder.Build().Run();
+CS
+}
+
+check_aspire_run_bundle_smoke() {
+  local major logfile fixture_dir
+  major="$(aspire_cli_major_version || true)"
+  if [[ -z "${major}" ]] || [[ "${major}" -lt 17 ]]; then
+    return 0
+  fi
+  if ! command -v dotnet >/dev/null 2>&1; then
+    echo "Skipping aspire run smoke: dotnet SDK not on this base image" >&2
+    return 0
+  fi
+  fixture_dir="$(mktemp -d)"
+  logfile="$(mktemp)"
+  cleanup_run_smoke() {
+    rm -rf "${fixture_dir:-}" "${logfile:-}"
+  }
+  trap cleanup_run_smoke RETURN
+  write_run_smoke_fixture "${fixture_dir}"
+  set +e
+  (
+    cd "${fixture_dir}"
+    timeout 180 env \
+      PATH="${PATH}" \
+      ASPIRE_HOME="${ASPIRE_HOME}" \
+      ASPIRE_LAYOUT_PATH="${ASPIRE_LAYOUT_PATH}" \
+      aspire run
+  ) >"${logfile}" 2>&1
+  set -e
+  if grep -qiE 'Bundle extraction failed|layout validation failed|Failed to rename legacy directory' "${logfile}"; then
+    echo "aspire run hit a bundle layout failure:" >&2
+    cat "${logfile}" >&2
+    return 1
+  fi
+  if grep -qi 'Invalid cross-device link' "${logfile}"; then
+    echo "aspire run hit bundle migration failure:" >&2
+    cat "${logfile}" >&2
+    return 1
+  fi
+  echo "aspire run passed bundle phase (log excerpt):"
+  head -n 20 "${logfile}"
+}
+
 check "sync script" test -x "${sync_script}"
 check "aspire on PATH" command -v aspire
 check "aspire not under /usr/local/bin" check_aspire_not_system_local
@@ -216,6 +281,7 @@ check "bundle symlink (Aspire 17+)" check_bundle_symlink_for_aspire_17
 
 layout="${ASPIRE_LAYOUT_PATH:-${ASPIRE_USER_HOME}/.aspire}"
 check "aspire setup" env ASPIRE_LAYOUT_PATH="${layout}" aspire setup --non-interactive
+check "aspire run (bundle smoke)" check_aspire_run_bundle_smoke
 
 if [[ "${ASPIRE_CLI_SYNC_VERIFY_ONLY:-0}" == "1" ]]; then
   if [[ ! -f aspire.config.json ]]; then

@@ -4,6 +4,8 @@ Installs the **Aspire CLI** under the container user’s home via the [official 
 
 Unlike `ghcr.io/microsoft/aspire-devcontainer-feature/aspire`, this feature installs under `~/.aspire` so bundle setup works reliably for non-root users. It does **not** install a .NET SDK—use `mcr.microsoft.com/devcontainers/dotnet` or the official `dotnet` feature when you need the SDK.
 
+**Why not Microsoft’s `aspire` feature?** Microsoft’s feature puts the CLI on **`/usr/local/bin`** and skips image-time bundle setup. `aspire-cli` keeps the CLI in the **container user’s home**, runs optional **`aspire setup`**, and can align the CLI to a repo SDK pin on create—intended for DinD/AppHost workflows validated in [issue #24](https://github.com/markheydon/devcontainer-features/issues/24). Full comparison: [Why not Microsoft’s aspire feature?](https://github.com/markheydon/devcontainer-features/blob/main/src/aspire-cli/README.md#why-not-microsofts-aspire-feature) in the feature README.
+
 **GHCR:** `ghcr.io/markheydon/devcontainer-features/aspire-cli:1`
 
 Full option reference, PATH notes, and testing: [src/aspire-cli/README.md](https://github.com/markheydon/devcontainer-features/blob/main/src/aspire-cli/README.md).

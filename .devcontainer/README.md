@@ -29,3 +29,16 @@ Use the repo helper instead of calling the CLI directly:
 It is what [feature-test.yml](../.github/workflows/feature-test.yml) runs per matrix job (`<feature-id> <base-image>`). With no arguments it exercises every `src/*` feature × every image in [scripts/official-base-images.txt](../scripts/official-base-images.txt) (often a superset of the CI matrix). In this dev container it falls back to running `test/<feature-id>/test.sh` inside the built image when the CLI bind mount fails.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for commands to run before a PR.
+
+### Docker-outside-of-docker vs Docker-in-Docker
+
+This dev container uses **[docker-outside-of-docker](https://github.com/devcontainers/features/tree/main/src/docker-outside-of-docker)** (DooD): the `docker` CLI inside the container talks to the **host** Docker daemon. Images and containers created by `./scripts/test-features.sh` or `devcontainer features test` are stored on the **host**, not inside the dev container filesystem.
+
+| Mode | Where images live | When you remove this dev container |
+|------|-------------------|-----------------------------------|
+| **DooD** (current) | Host Docker | Test/build images **usually remain** on the host until you prune them |
+| **DinD** ([docker-in-docker](https://github.com/devcontainers/features/tree/main/src/docker-in-docker)) | Daemon (and graph) inside the dev container (often privileged) | Images built only through that in-container daemon **typically go away** with the container, unless you mount a persistent volume for Docker data |
+
+DinD can reduce long-term disk use on the host when you frequently build many feature-test images locally, but it needs **privileged** mode, is slower for nested builds, and has different socket/path behaviour. DooD is the common choice for feature authors who want the host to cache layers between sessions.
+
+To reclaim space with DooD, prune on the host (for example `docker image prune -a` when you are sure nothing else needs those images). Switching this repo’s maintainer dev container to DinD would be a deliberate change (update [devcontainer.json](devcontainer.json) and re-verify `./scripts/test-features.sh`).

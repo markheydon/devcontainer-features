@@ -1,0 +1,9 @@
+{
+  "appHost": {
+    "path": "AppHost/Program.cs",
+    "language": "csharp"
+  },
+  "sdk": {
+    "version": "17.0.0"
+  }
+}
